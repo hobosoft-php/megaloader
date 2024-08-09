@@ -5,9 +5,16 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Hobosoft\\Megaloader\\": "src/"
+            "Hobosoft\\MegaLoader\\": "src/"
         }
     },
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "psr/log": "^3.0@dev",
+        "laminas/laminas-loader": "2.11.x-dev",
+        "psr/simple-cache": "^3.0@dev"
+    },
+    "require-dev": {
+        "phpunit/php-code-coverage": "^11.0@dev"
+    }
 }
