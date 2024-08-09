@@ -1,0 +1,23 @@
+#!/usr/bin/php
+<?php
+
+use Library\Boot\Boot;
+use Library\Boot\TinyLogger;
+use Library\Classloader\Metadata\ClassParser;
+
+define('ROOTPATH', dirname(__DIR__, 2));
+chdir(ROOTPATH);
+
+require_once ROOTPATH . '/vendor/autoload.php';
+require_once ROOTPATH . '/library/Boot/Boot.php';
+
+$boot = new Boot();
+$boot->preinit();
+
+$logger = new TinyLogger();
+$cache = new FileCache(__DIR__.'/cache');
+
+$c = new ClassParser($logger, $cache);
+$i = $c->getInfo(__DIR__ . '/GenericMetadata.php');
+
+print_r($i);

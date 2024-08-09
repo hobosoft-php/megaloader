@@ -1,0 +1,13 @@
+{
+    "name": "hobosoft/megaloader",
+    "description": "PHP mega loader",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Hobosoft\\Megaloader\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {}
+}
