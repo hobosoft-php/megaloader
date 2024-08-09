@@ -1,6 +1,8 @@
 {
     "name": "hobosoft/megaloader",
+    "version": "1.0.0",
     "description": "PHP mega loader",
+    "minimum-stability": "dev",
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -8,12 +10,11 @@
             "Hobosoft\\MegaLoader\\": "src/"
         }
     },
-    "minimum-stability": "dev",
     "require": {
         "psr/log": "^3.0@dev",
         "psr/simple-cache": "^3.0@dev",
-        "hobosoft/boot": "dev-main",
-        "hobosoft/config": "dev-main"
+        "hobosoft/boot": "*",
+        "hobosoft/config": "*"
     },
     "require-dev": {
         "laminas/laminas-loader": "2.11.x-dev",
