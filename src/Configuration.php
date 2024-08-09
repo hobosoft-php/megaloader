@@ -2,15 +2,13 @@
 
 namespace Hobosoft\MegaLoader;
 
-use Library\Boot\Paths;
-use Library\Config\Definitions\Builder\TreeBuilder;
-use Library\Config\Definitions\Exceptions\Exception;
-use Library\Config2\Contracts\ConfigurationInterface;
-use Library\Config2\Schema\Context;
-use Library\Config2\Schema\Define;
-use Library\Config2\Schema\Exceptions\ValidationException;
-use Library\Config2\Schema\Processor;
-use Library\Config2\Schema\Types\Structure;
+use Hobosoft\Boot\Paths;
+use Hobosoft\Config\Contracts\ConfigurationInterface;
+use Hobosoft\Config\Schema\Context;
+use Hobosoft\Config\Schema\Define;
+use Hobosoft\Config\Schema\Exceptions\ValidationException;
+use Hobosoft\Config\Schema\Processor;
+use Hobosoft\Config\Schema\Types\Structure;
 
 class Configuration //implements ConfigurationInterface
 {

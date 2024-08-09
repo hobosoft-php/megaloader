@@ -4,64 +4,81 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "488d205f4c1ea66a8bff0cfa8eb065a6",
+    "content-hash": "dd542cfa3d610e0c8bb831641ca07c11",
     "packages": [
         {
-            "name": "laminas/laminas-loader",
-            "version": "2.11.x-dev",
+            "name": "hobosoft/boot",
+            "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/laminas/laminas-loader.git",
-                "reference": "e6fe952304ef40ce45cd814751ab35d42afdad12"
+                "url": "git@github.com:holodnak/boot.git",
+                "reference": "e727453971e8a2d65d10f5e949e83d9692ee74f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-loader/zipball/e6fe952304ef40ce45cd814751ab35d42afdad12",
-                "reference": "e6fe952304ef40ce45cd814751ab35d42afdad12",
+                "url": "https://api.github.com/repos/holodnak/boot/zipball/e727453971e8a2d65d10f5e949e83d9692ee74f5",
+                "reference": "e727453971e8a2d65d10f5e949e83d9692ee74f5",
                 "shasum": ""
             },
             "require": {
-                "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0"
-            },
-            "conflict": {
-                "zendframework/zend-loader": "*"
+                "psr/log": "3.x-dev"
             },
             "require-dev": {
-                "laminas/laminas-coding-standard": "~2.4.0",
-                "phpunit/phpunit": "~9.5.25"
+                "pestphp/pest": "3.x-dev"
             },
             "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Laminas\\Loader\\": "src/"
+                    "Hobosoft\\Boot\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "BSD-3-Clause"
+                "MIT"
             ],
-            "description": "Autoloading and plugin loading strategies",
-            "homepage": "https://laminas.dev",
-            "keywords": [
-                "laminas",
-                "loader"
-            ],
+            "description": "Booting Utilities",
             "support": {
-                "chat": "https://laminas.dev/chat",
-                "docs": "https://docs.laminas.dev/laminas-loader/",
-                "forum": "https://discourse.laminas.dev",
-                "issues": "https://github.com/laminas/laminas-loader/issues",
-                "rss": "https://github.com/laminas/laminas-loader/releases.atom",
-                "source": "https://github.com/laminas/laminas-loader"
+                "source": "https://github.com/holodnak/boot/tree/main",
+                "issues": "https://github.com/holodnak/boot/issues"
             },
-            "funding": [
-                {
-                    "url": "https://funding.communitybridge.org/projects/laminas-project",
-                    "type": "community_bridge"
+            "time": "2024-08-09T16:45:29+00:00"
+        },
+        {
+            "name": "hobosoft/config",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:holodnak/config.git",
+                "reference": "0dba957ea7f1d4edf79a8e2b687aa4b6e694ac65"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/holodnak/config/zipball/0dba957ea7f1d4edf79a8e2b687aa4b6e694ac65",
+                "reference": "0dba957ea7f1d4edf79a8e2b687aa4b6e694ac65",
+                "shasum": ""
+            },
+            "require": {
+                "psr/log": "^3.0@dev"
+            },
+            "require-dev": {
+                "pestphp/pest": "3.x-dev"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Hobosoft\\Config\\": "src/"
                 }
+            },
+            "license": [
+                "MIT"
             ],
-            "time": "2023-10-18T09:58:51+00:00"
+            "description": "Configuration Equipment",
+            "support": {
+                "source": "https://github.com/holodnak/config/tree/main",
+                "issues": "https://github.com/holodnak/config/issues"
+            },
+            "time": "2024-08-09T16:23:54+00:00"
         },
         {
             "name": "psr/log",
@@ -168,6 +185,63 @@
         }
     ],
     "packages-dev": [
+        {
+            "name": "laminas/laminas-loader",
+            "version": "2.11.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laminas/laminas-loader.git",
+                "reference": "e6fe952304ef40ce45cd814751ab35d42afdad12"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laminas/laminas-loader/zipball/e6fe952304ef40ce45cd814751ab35d42afdad12",
+                "reference": "e6fe952304ef40ce45cd814751ab35d42afdad12",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0"
+            },
+            "conflict": {
+                "zendframework/zend-loader": "*"
+            },
+            "require-dev": {
+                "laminas/laminas-coding-standard": "~2.4.0",
+                "phpunit/phpunit": "~9.5.25"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Laminas\\Loader\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Autoloading and plugin loading strategies",
+            "homepage": "https://laminas.dev",
+            "keywords": [
+                "laminas",
+                "loader"
+            ],
+            "support": {
+                "chat": "https://laminas.dev/chat",
+                "docs": "https://docs.laminas.dev/laminas-loader/",
+                "forum": "https://discourse.laminas.dev",
+                "issues": "https://github.com/laminas/laminas-loader/issues",
+                "rss": "https://github.com/laminas/laminas-loader/releases.atom",
+                "source": "https://github.com/laminas/laminas-loader"
+            },
+            "funding": [
+                {
+                    "url": "https://funding.communitybridge.org/projects/laminas-project",
+                    "type": "community_bridge"
+                }
+            ],
+            "time": "2023-10-18T09:58:51+00:00"
+        },
         {
             "name": "nikic/php-parser",
             "version": "v5.1.0",
@@ -778,8 +852,10 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "psr/log": 20,
+        "psr/simple-cache": 20,
+        "hobosoft/boot": 20,
         "laminas/laminas-loader": 20,
-        "psr/simple-cache": 20
+        "phpunit/php-code-coverage": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

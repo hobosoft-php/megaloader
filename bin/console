@@ -1,15 +1,16 @@
 #!/usr/bin/php
 <?php
 
-use Library\Boot\Boot;
-use Library\Boot\TinyLogger;
-use Library\Classloader\Metadata\ClassParser;
+namespace Hobosoft\MegaLoader\Bin;
 
-define('ROOTPATH', dirname(__DIR__, 2));
+define('ROOTPATH', dirname(__DIR__, 1));
 chdir(ROOTPATH);
+require ROOTPATH.'/vendor/autoload.php';
+require ROOTPATH.'/bootstrap.php';
 
-require_once ROOTPATH . '/vendor/autoload.php';
-require_once ROOTPATH . '/library/Boot/Boot.php';
+
+
+/*require_once ROOTPATH . '/library/Boot/Boot.php';
 
 $boot = new Boot();
 $boot->preinit();
@@ -20,4 +21,4 @@ $cache = new FileCache(__DIR__.'/cache');
 $c = new ClassParser($logger, $cache);
 $i = $c->getInfo(__DIR__ . '/GenericMetadata.php');
 
-print_r($i);
+print_r($i);*/

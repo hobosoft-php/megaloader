@@ -21,8 +21,6 @@ include_once(__DIR__ . '/Contracts/MetadataInterface.php');
 include_once(__DIR__ . '/Configuration.php');
 include_once(__DIR__ . '/TinyLogger.php');
 include_once(__DIR__ . '/Loaders/AbstractLoader.php');
-include_once(__DIR__ . '/Loaders/Psr0Loader.php');
-include_once(__DIR__ . '/Loaders/Psr4Loader.php');
 
 class MegaLoader implements ManagerInterface
 {
@@ -144,5 +142,10 @@ class MegaLoader implements ManagerInterface
     public function loadClass(string $className): bool
     {
         // TODO: Implement loadClass() method.
+    }
+
+    public function setConfig(mixed $config): void
+    {
+        // TODO: Implement setConfig() method.
     }
 }
