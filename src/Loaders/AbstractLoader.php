@@ -2,42 +2,34 @@
 
 namespace Hobosoft\MegaLoader\Loaders;
 
-use Hobosoft\MegaLoader\Contracts\ClassLoaderInterface;
-use Hobosoft\MegaLoader\Contracts\ManagerInterface;
-use Psr\Log\LoggerAwareInterface;
+use Hobosoft\Config\Contracts\ConfigInterface;
+use Hobosoft\MegaLoader\Contracts\LoaderInterface;
+use Hobosoft\MegaLoader\Contracts\LocatorInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
-abstract class AbstractLoader implements ClassLoaderInterface
+abstract class AbstractLoader implements LocatorInterface, LoaderInterface
 {
     public function __construct(
-        protected ManagerInterface    $parent,
-        protected ?PsrLoggerInterface $logger,
-        protected ?array              $config = null,
-    ) {
-        $this->config = $config ?? self::getDefaultConfig();
-    }
+        protected PsrLoggerInterface $logger,
+        protected ConfigInterface    $config,
+        protected array              $locators = [],
+    ) {}
 
-    public static function getDefaultConfig(): array
+    public function locate(string $name): string|bool
     {
-        return [
-            'cache' => [
-                'enabled' => true,
-                'backend' => 'fileCache',
-                'prefix' => 'megaloader-'.PHP_SAPI,
-            ],
-            'loaders' => [
-                ClassLoader::class,
-                ModuleLoader::class,
-                PluginLoader::class,
-            ],
-            'lookups' => [
-                Psr0Lookup::class,
-                Psr4Lookup::class,
-                ClassMapLookup::class,
-            ],
-        ];
+        foreach ($this->locators as $i => $locator) {
+            if($locator instanceof \Closure) {
+                $this->locators[$i] = $locator();
+            }
+            else if(is_string($locator)) {
+                $this->locators[$i] = new $locator($this->logger, $this->config);
+            }
+            if(($filename = $locator->locate($name)) !== null) {
+                return $filename;
+            }
+        }
+        return false;
     }
 
-    abstract public function loadClass(string $className): bool;
-    abstract public function lookupClass(string $className): ?string;
+    //abstract public function load(string $name): bool;
 }

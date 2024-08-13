@@ -2,25 +2,24 @@
 
 namespace Hobosoft\MegaLoader\Loaders;
 
-use Hobosoft\MegaLoader\Contracts\ClassLoaderInterface;
-use Hobosoft\MegaLoader\Loaders\AbstractLoader;
+use Hobosoft\Boot\Boot;
+use Hobosoft\Config\Contracts\ConfigInterface;
+use Hobosoft\MegaLoader\Contracts\LoaderInterface;
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
 class ClassLoader extends AbstractLoader
 {
-    public function lookupClass(string $className): ?string
-    {
-        // TODO: Implement lookupClass() method.
+    public function __construct(
+        protected PsrLoggerInterface $logger,
+        protected ConfigInterface    $config,
+        protected array              $locators = [],
+    ) {
+        parent::__construct($logger, $config);
     }
 
-    public function loadClass(string $className): bool
+    public function load(string $name): bool
     {
-        if (($info = $this->lookupClass($className)) === null) {
-            $this->logger->info("Lookup failed with loader ".static::class.".");
-            if($this->fallback instanceof ClassLoaderInterface)
-            $this->logger->debug("Lookup failed!  Trying fallback loader ".get_class($this->fallback).".");
-            return ($this->fallback instanceof ClassLoaderInterface) && $this->fallback->loadClass($className);
-        }
-        (function(string $fn):void { require $fn; })($info);
+        Boot::include($name);
         return true;
     }
 }

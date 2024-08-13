@@ -2,8 +2,8 @@
 
 namespace Hobosoft\MegaLoader\Loaders;
 
-use Hobosoft\MegaLoader\Contracts\ClassLoaderInterface;
-use Hobosoft\MegaLoader\Contracts\ManagerInterface;
+use Hobosoft\Config\Contracts\ConfigInterface;
+use Hobosoft\MegaLoader\Contracts\LoaderInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
 class LoaderAggregate extends AbstractLoader
@@ -11,47 +11,42 @@ class LoaderAggregate extends AbstractLoader
     protected array $loaders = [];
 
     public function __construct(
-        ManagerInterface   $parent,
-        PsrLoggerInterface $logger,
-        array              $loaders,
+        protected PsrLoggerInterface $logger,
+        protected ConfigInterface    $config,
+        array                        $loaders = [],
     )
     {
-        parent::__construct($parent, $logger);
-        $this->loaders = [];
+        parent::__construct($logger, $config);
         foreach ($loaders as $loader) {
-            $this->loaders[] = match(true) {
-                $loader instanceof ClassLoaderInterface => static fn() => $loader,
-                $loader instanceof \Closure => $loader,
-                is_string($loader) => static fn() => new ($loader)($parent, $logger),
-                default => throw new \Exception("Loader '{$loader}' not implemented"),
-            };
+            $this->addLoader($loader, false);
         }
     }
 
-    protected function getLoader(string $name): ClassLoaderInterface|null
+    public function addLoader(\Closure|LoaderInterface|string $loader, bool $prepend = true): void
     {
-        return ($this->loaders[$name] ?? null);
+        $loader = match(true) {
+            $loader instanceof LoaderInterface || $loader instanceof \Closure => $loader,
+            is_string($loader) => static fn() => new $loader($this->logger, $this->config),
+            default => throw new \Exception("Loader class type '".get_class($loader)."' not implemented"),
+        };
+        if($prepend) {
+            $this->loaders = [$loader] + $this->loaders;
+        }
+        else {
+            $this->loaders = $this->loaders + [$loader];
+        }
     }
 
-    public function lookupClass(string $className): ?string
+    public function load(string $className): bool
     {
         for($i=0, $iMax = count($this->loaders); $i< $iMax; $i++) {
-            if(is_string($this->loaders[$i])) {
-                $this->loaders[$i] = new ($this->loaders[$i])();
-            }
-            else if($this->loaders[$i] instanceof \Closure) {
+            if($this->loaders[$i] instanceof \Closure) {
                 $this->loaders[$i] = ($this->loaders[$i])();
-            }
-            else if($this->loaders[$i] instanceof ClassLoaderInterface) {
-                //$this->loaders[$i] = $this->loaders[$i];
-            }
-            else {
-                print('');
             }
             if (($arr = $this->loaders[$i]->lookupClass($className)) !== null) {
                 return $arr;
             }
         }
-        return ($this->fallback !== null) ? $this->fallback->lookupClass($className) : null;
+        return false;
     }
 }

@@ -7,17 +7,24 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Hobosoft\\MegaLoader\\": "src/"
+            "Hobosoft\\MegaLoader\\": "src/",
+            "Hobosoft\\MegaLoader\\Tests\\": "tests/"
         }
     },
     "require": {
         "psr/log": "^3.0@dev",
         "psr/simple-cache": "^3.0@dev",
         "hobosoft/boot": "*",
-        "hobosoft/config": "*"
+        "hobosoft/config": "*",
+        "ext-apcu": "*"
     },
     "require-dev": {
         "laminas/laminas-loader": "2.11.x-dev",
         "phpunit/php-code-coverage": "^11.0@dev"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     }
 }

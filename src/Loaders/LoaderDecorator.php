@@ -2,21 +2,20 @@
 
 namespace Hobosoft\MegaLoader\Loaders;
 
-use Hobosoft\MegaLoader\Contracts\ClassLoaderInterface;
+use Hobosoft\MegaLoader\Contracts\LoaderInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
-class LoaderDecorator extends AbstractLoader
+abstract class LoaderDecorator extends AbstractLoader
 {
     public function __construct(
-        ?PsrLoggerInterface   $logger,
-        ?ClassLoaderInterface $loader,
-        ?array                $config = null,
+        LoaderInterface     $loader,
+        array               $config = [],
     ) {
-        parent::__construct($logger, $config, null);
-        $this->config = $config ?? self::getDefaultConfig();
+        parent::__construct($loader->getParent(), $config, $config);
+        $this->config = $config;
     }
 
-    public function getLoader(): ?ClassLoaderInterface
+    public function getLoader(): ?LoaderInterface
     {
         return $this->loader;
     }
@@ -26,8 +25,8 @@ class LoaderDecorator extends AbstractLoader
         $this->loader = $loader;
     }
 
-    public function lookupClass(string $className): ?string
+    public function load(string $className): bool
     {
-        return $this->loader->lookupClass($className);
+        return $this->loader->loadClass($className);
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace Hobosoft\MegaLoader\Loaders;
+namespace Hobosoft\MegaLoader\Locators;
 
-class Psr4Lookup extends AbstractLoader
+class Psr4Locator extends AbstractLocator
 {
-    public function lookupClass(string $className): ?string
+    public function locate(string $className): string|bool
     {
         $fn = strtr($className, '\\/', '/');
         $sfn = lcfirst($fn);
@@ -19,6 +19,6 @@ class Psr4Lookup extends AbstractLoader
                 }
             }
         }
-        return null;
+        return false;
     }
 }

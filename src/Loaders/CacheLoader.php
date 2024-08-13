@@ -2,7 +2,8 @@
 
 namespace Hobosoft\MegaLoader\Loaders;
 
-use Hobosoft\MegaLoader\Contracts\ClassLoaderInterface;
+use Hobosoft\Config\Contracts\ConfigInterface;
+use Hobosoft\MegaLoader\Contracts\LoaderInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
 class CacheLoader extends AbstractLoader
@@ -13,12 +14,12 @@ class CacheLoader extends AbstractLoader
     protected string $path;
 
     public function __construct(
-        ?PsrLoggerInterface   $logger,
-        ?array                $config = null,
-        ?ClassLoaderInterface $decorated = null,
+        PsrLoggerInterface      $logger,
+        ConfigInterface         $config,
+        private LoaderInterface $decorated,
     )
     {
-        parent::__construct($logger, $config, $decorated);
+        parent::__construct($logger, $config);
         $this->path = $config['cache']['path'];
         if (!is_dir($this->path) && !mkdir($this->path, 0777, true) && !is_dir($this->path)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->path));
@@ -37,22 +38,24 @@ class CacheLoader extends AbstractLoader
         file_put_contents($fn, $head . var_export($this->classes, true) . $tail);
     }
 
-    public function __call(string $name, array $arguments): mixed
+    public function locate(string $name): string|bool
     {
-        if(method_exists($this->fallback, $name)) {
-            return call_user_func_array([$this->fallback, $name], $arguments);
+        if(array_key_exists($name, $this->classes)) {
+            return $this->classes[$name];
         }
-        return null;
+        if(($ret = $this->decorated->locate($name)) !== null) {
+            return ($this->classes[$name] = $ret);
+        }
+        return false;
     }
 
-    public function lookupClass(string $className): ?string
+    public function load(string $name): bool
     {
-        if(array_key_exists($className, $this->classes)) {
-            return $this->classes[$className];
+        if(array_key_exists($name, $this->classes)) {
+            return $this->classes[$name];
         }
-        if(($ret = $this->fallback->lookupClass($className)) !== null) {
-            return ($this->classes[$className] = $ret);
+        if(($ret = $this->decorated->load($name)) === true) {
+            $this->classes[$name] = $ret;
         }
-        return null;
     }
 }

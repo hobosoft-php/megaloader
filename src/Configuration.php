@@ -2,67 +2,100 @@
 
 namespace Hobosoft\MegaLoader;
 
+use Hobosoft\Boot\PathEnum;
 use Hobosoft\Boot\Paths;
-use Hobosoft\Config\Contracts\ConfigurationInterface;
 use Hobosoft\Config\Schema\Context;
 use Hobosoft\Config\Schema\Define;
 use Hobosoft\Config\Schema\Exceptions\ValidationException;
 use Hobosoft\Config\Schema\Processor;
 use Hobosoft\Config\Schema\Types\Structure;
+use Hobosoft\MegaLoader\Locators\ClassMapLocator;
+use Hobosoft\MegaLoader\Locators\Psr0Locator;
+use Hobosoft\MegaLoader\Locators\Psr4Locator;
+use stdClass;
+
+/*
+
+    public static function getDefaultConfig(): array
+    {
+        return [
+            'cache' => [
+                'enabled' => true,
+                'backend' => 'fileCache',
+                'prefix' => 'megaloader-'.PHP_SAPI,
+            ],
+            'loaders' => [
+                Psr4Lookup::class,
+                ClassMapLookup::class,
+            ],
+            'lookups' => [
+                Psr0Lookup::class,
+                Psr4Lookup::class,
+                ClassMapLookup::class,
+            ],
+        ];
+    }
+
+
+
+ */
 
 class Configuration //implements ConfigurationInterface
 {
     const string CACHE_FOLDER_NAME = 'classloader-' . PHP_SAPI;
     private static Structure $schema;
 
-    public static function getConfigDefault(): array|\stdClass
+    public static function getSchema(): Structure
     {
-        $transformCacheEnabled = function ($value, Context $context) {
-            switch(true) {
-                case is_bool($value): return $value;
-                case is_string($value): return ($value === 'true') ? true : false;
-                case is_numeric($value): return ($value <= 0) ? false : true;
-                default: throw new Exception("Invalid type");
-            }
-        };
-
-        //$config->load(Paths::get(\Path::CONFIG));
-
         if(isset(self::$schema) === false) {
+            $transformCacheEnabled = function ($value, Context $context) {
+                return match (true) {
+                    is_numeric($value) => $value > 0,
+                    is_string($value) => $value === 'true',
+                    is_bool($value) => $value,
+                    default => throw new \Exception("Invalid type"),
+                };
+            };
             self::$schema = Define::structure([
                 'cache' => Define::structure([
-                    'enabled' => Define::anyOf('true', 'false', true, false, 1, 0)->castTo('bool')->transform($transformCacheEnabled),
+                    'enabled' => Define::anyOf('true', 'false', true, false, 1, 0)->castTo('bool')->default(false)->transform($transformCacheEnabled),
                     'backend' => Define::string('FileCache'),
-                    'path' => Define::string(Paths::join(Path::CACHE, self::CACHE_FOLDER_NAME)),
+                    'path' => Define::string(Paths::join(PathEnum::CACHE, self::CACHE_FOLDER_NAME)),
                 ])->castTo('array'),
-                'maxDepth' => Define::int(10)->min(0),
-                'includes' => Define::list([
-                    'src',
-                    'library',
-                    'plugins',
-                    'vendor',
-                ]),
-                'excludes' => Define::list([
-                    'templates',
-                    'var',
-                ]),
-                'psr-4' => Define::structure([
-                    'Source\\' => Define::list(['src/', 'source/']),
-                    'Library\\' => Define::list(['lib/', 'library/']),
-                    'Modules\\' => Define::list(['modules/']),
-                    'Plugins\\' => Define::list(['plugins/']),
-                    'Application\\' => Define::list(['app/', 'src/app/']),
-                    'Psr\\Container\\' => Define::list(['vendor/psr/container/src/']),
-                ])->castTo('array'),
+                'psr-0' => Define::arrayOf('string', 'string'),
+                'psr-4' => Define::arrayOf('string', 'string'),
+                'classMap' => Define::listOf('string')->description('Source files/directories to be scanned to make the class map.'),
+                'plugins' => Define::arrayOf('string', 'string')->description('Array of plugin namespace prefix => plugin path'),
+                'modules' => Define::arrayOf('string', 'string')->description('Array of module namespace prefix => module path'),
             ]);
         }
+        return self::$schema;
+    }
 
+    public static function getDefault(): array
+    {
+        return self::process([]);
+    }
+
+    public static function process(array $config): array
+    {
+        $normalized = [];
         try {
-            $normalized = (new Processor())->process(self::$schema, []);
+            $normalized = (new Processor())->process(self::getSchema(), $config);
         } catch (ValidationException $e) {
             echo 'Data is invalid: ' . $e->getMessage();
         }
-        return $normalized;
+        return self::stdToArray($normalized);
+    }
+
+    private static function stdToArray(stdClass $std): array
+    {
+        foreach(($ret = (array)$std) as &$item) {
+            if(is_object($item)) {
+                $item = self::stdToArray($item);
+            }
+        }
+        return $ret;
     }
 }
 
