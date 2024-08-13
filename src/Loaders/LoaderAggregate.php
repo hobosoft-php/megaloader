@@ -18,11 +18,11 @@ class LoaderAggregate extends AbstractLoader
     {
         parent::__construct($logger, $config);
         foreach ($loaders as $loader) {
-            $this->addLoader($loader, false);
+            $this->registerLoader($loader, false);
         }
     }
 
-    public function addLoader(\Closure|LoaderInterface|string $loader, bool $prepend = true): void
+    public function registerLoader(\Closure|LoaderInterface|string $loader, bool $prepend = true): void
     {
         $loader = match(true) {
             $loader instanceof LoaderInterface || $loader instanceof \Closure => $loader,

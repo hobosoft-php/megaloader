@@ -24,6 +24,9 @@ $config[MegaLoader::CONFIG_SECTION] = [
     ],
     'plugins' => [
         'Hobosoft\\Plugins\\' => 'plugins/',
+    ],
+    'modules' => [
+        'Hobosoft\\Modules\\' => 'modules/',
     ]
 ];
 

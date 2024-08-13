@@ -16,11 +16,13 @@
         "psr/simple-cache": "^3.0@dev",
         "hobosoft/boot": "*",
         "hobosoft/config": "*",
-        "ext-apcu": "*"
+        "ext-apcu": "*",
+        "hobosoft/fileloaders": "^1.0",
+        "symfony/yaml": "7.2.x-dev"
     },
     "require-dev": {
         "laminas/laminas-loader": "2.11.x-dev",
-        "phpunit/php-code-coverage": "^11.0@dev"
+        "phpunit/php-code-coverage": "*"
     },
     "config": {
         "allow-plugins": {

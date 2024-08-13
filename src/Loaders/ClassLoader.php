@@ -5,21 +5,22 @@ namespace Hobosoft\MegaLoader\Loaders;
 use Hobosoft\Boot\Boot;
 use Hobosoft\Config\Contracts\ConfigInterface;
 use Hobosoft\MegaLoader\Contracts\LoaderInterface;
+use Hobosoft\MegaLoader\Utils;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
 class ClassLoader extends AbstractLoader
 {
     public function __construct(
-        protected PsrLoggerInterface $logger,
-        protected ConfigInterface    $config,
-        protected array              $locators = [],
+        PsrLoggerInterface $logger,
+        ConfigInterface    $config,
+        array              $locators = [],
     ) {
-        parent::__construct($logger, $config);
+        parent::__construct($logger, $config, $locators);
     }
 
     public function load(string $name): bool
     {
-        Boot::include($name);
+        Utils::include($name);
         return true;
     }
 }

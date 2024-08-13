@@ -22,7 +22,8 @@ class MegaLoader
     const string CONFIG_SECTION = 'megaloader';
     const string CACHE_SECTION = 'megaloader-' . PHP_SAPI;
 
-    protected mixed $loader;
+    private array $loaders = [];
+    protected LoaderDelegator|CacheLoader $loader;
 
     public function __construct(
         private PsrLoggerInterface $logger,
@@ -34,25 +35,26 @@ class MegaLoader
         Boot::include(__DIR__ . '/Locators/AbstractLocator.php');
         Boot::include(__DIR__ . '/Locators/Psr4Locator.php');
         $this->config[self::CONFIG_SECTION] = Configuration::process($this->config[self::CONFIG_SECTION]);
-        spl_autoload_register([$this, 'loadClass'], true, true);
-        $this->loader = new LoaderDelegator($logger, $this->config, [
+        $loaders = [
             'class' => static fn() => new ClassLoader($logger, $config, [
                 ClassMapLocator::class,
                 Psr4Locator::class,
                 Psr0Locator::class,
             ]),
             'plugin' => static fn() => new PluginLoader($logger, $config, [
-                PluginLocator::class
+                PluginLocator::class,
             ]),
-        ]);
+        ];
+        $this->loader = new LoaderDelegator($logger, $this->config, $loaders);
         if((($this->config['cache'] ?? [])['enabled'] ?? false) === true) {
             $this->loader = new CacheLoader($logger, $config, $this->loader);
         }
+        spl_autoload_register([$this, 'load'], true, true);
     }
     
     public function __destruct()
     {
-        spl_autoload_unregister([$this, 'loadClass']);
+        spl_autoload_unregister([$this, 'load']);
     }
 
     public function registerLoader(\Closure|LoaderInterface|string $loader, string $type = 'class'): void

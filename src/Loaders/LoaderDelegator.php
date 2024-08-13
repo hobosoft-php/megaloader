@@ -10,6 +10,18 @@ class LoaderDelegator extends AbstractLoader
 {
     protected array $loaders = [];
 
+    public function __construct(
+        protected PsrLoggerInterface $logger,
+        protected ConfigInterface    $config,
+        array                        $loaders = [],
+    )
+    {
+        parent::__construct($logger, $config);
+        foreach ($loaders as $type => $loader) {
+            $this->registerLoader($loader, $type);
+        }
+    }
+
     public function registerLoader(\Closure|LoaderInterface|string $loader, string $type = 'class'): void
     {
         if(array_key_exists($type, $this->loaders) !== false) {
@@ -23,6 +35,9 @@ class LoaderDelegator extends AbstractLoader
         if(array_key_exists($type, $this->loaders) === false) {
             throw new \Exception("Loader type '$type' does not exist.");
         }
+        if($this->loaders[$type] instanceof \Closure) {
+            $this->loaders[$type] = ($this->loaders[$type])($this->logger, $this->config);
+        }
         return $this->loaders[$type]->locate($name);
     }
 
@@ -30,9 +45,6 @@ class LoaderDelegator extends AbstractLoader
     {
         if(($fn = $this->locate($name, $type)) === false) {
             return false;
-        }
-        if($this->loaders[$type] instanceof \Closure) {
-            $this->loaders[$type] = ($this->loaders[$type])($this->logger, $this->config);
         }
         if (($arr = $this->loaders[$type]->load($fn)) !== null) {
             return $arr;

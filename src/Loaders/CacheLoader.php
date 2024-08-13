@@ -51,11 +51,6 @@ class CacheLoader extends AbstractLoader
 
     public function load(string $name): bool
     {
-        if(array_key_exists($name, $this->classes)) {
-            return $this->classes[$name];
-        }
-        if(($ret = $this->decorated->load($name)) === true) {
-            $this->classes[$name] = $ret;
-        }
+        return $this->decorated->load($this->locate($name));
     }
 }

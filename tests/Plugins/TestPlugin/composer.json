@@ -1,0 +1,13 @@
+{
+    "name": "hobosoft/test-plugin",
+    "description": "Test Plugin",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Hobosoft\\TestPlugin\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {}
+}

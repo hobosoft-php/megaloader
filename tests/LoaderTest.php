@@ -2,32 +2,50 @@
 
 namespace Hobosoft\MegaLoader\Tests;
 
+use Hobosoft\Boot\Tiny\TinyLogger;
 use Hobosoft\MegaLoader\Contracts\LocatorInterface;
 use Hobosoft\MegaLoader\MegaLoader;
+use Hobosoft\Config\Config;
+use Hobosoft\MegaLoader\Tests\Classes\NullDatabase;
+use Hobosoft\MegaLoader\Tests\Plugins\TestPlugin\src\TestPlugin;
 use Psr\Log\NullLogger;
 
 define('ROOTPATH', dirname(__DIR__));
 require __DIR__.'/../vendor/autoload.php';
 
-
-class TestLookup1 implements LocatorInterface
+function cfg()
 {
-    public function locate(string $className): ?string
-    {
-        print(__CLASS__ . " looking up!\n");
-    }
+    $config = new Config(new TinyLogger(), null, []);
+    $config[MegaLoader::CONFIG_SECTION] = [
+        'cache' => [
+            'enabled' => false,
+        ],
+        'classMap' => [
+            'src'
+        ],
+        'psr-4' => [
+            'Hobosoft\\MegaLoader\\' => 'src/',
+            'Hobosoft\\MegaLoader\\Tests\\' => 'tests/',
+        ],
+        'plugins' => [
+            'Hobosoft\\Plugins\\' => 'tests/Plugins/',
+            'Hobosoft\\Plugin\\' => 'tests/Plugins/',
+        ],
+        'modules' => [
+            'Hobosoft\\Modules\\' => 'tests/Modules/',
+            'Hobosoft\\Module\\' => 'tests/Modules/',
+        ]
+    ];
+    return $config;
 }
-
-class TestLookup2 implements LocatorInterface
-{
-    public function locate(string $className): ?string
-    {
-        print(__CLASS__ . " looking up!\n");
-    }
-}
-
-it('class creation', function () {
-    $loader = new MegaLoader(new NullLogger());
-    $loader->addLocator(TestLookup1::class);
-    $loader->addLocator(TestLookup2::class);
+it('class load', function () {
+    $loader = new MegaLoader(new TinyLogger(), cfg());
+    $n = new NullDatabase();
+    expect($n)->toBeInstanceOf(NullDatabase::class);
+});
+it('plugin load', function () {
+    $loader = new MegaLoader(new TinyLogger(), cfg());
+    $loader->load('Hobosoft\\Plugin\\TestPlugin', 'plugin');
+    $n = new TestPlugin();
+    expect($n)->toBeInstanceOf(TestPlugin::class);
 });

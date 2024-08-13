@@ -1,0 +1,9 @@
+manifest:
+  package:
+    name: TestPlugin
+    version: 1.0.0
+    license: MIT
+    icon: 'Resource/icon.png'
+    class: 'Hobosoft\\Plugin\\TestPlugin'
+  autoload:
+    include: 'composer.json@autoload'
