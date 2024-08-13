@@ -11,6 +11,11 @@ class Utils
         $formatTrace = function(array $trace): string {
             $ret = '';
             foreach ($trace as $item => $data) {
+                //print_r($data);
+                //$data = is_array($data) ? implode(', ', $data) : $data;
+                if(is_array($data)) {
+                    $data = "<array>";
+                }
                 $ret .= "$item: $data\n";
             }
             return $ret;
@@ -25,7 +30,7 @@ class Utils
                 self::$includedFiles[$fn] = ['error' => true, 'message' => "This method only accepts relative paths or absolute paths beginning with ".ROOTPATH.".\n\n".$formatTrace(debug_backtrace())];
                 throw new \Exception("This method only accepts relative paths or absolute paths beginning with ".ROOTPATH.".\n\n".$formatTrace(debug_backtrace()));
             }
-            elseif (file_exists(($fn = ROOTPATH . '/' . $fn)) === false) {
+            elseif (file_exists(($fn)) === false) {
                 self::$includedFiles[$fn] = ['error' => true, 'message' => "Include file '$fn' not found, please check autoloader configuration.\n\n".$formatTrace(debug_backtrace())];
                 throw new \Exception("Include file '$fn' not found, please check autoloader configuration.\n\n".$formatTrace(debug_backtrace()));
             }

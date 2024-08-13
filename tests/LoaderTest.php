@@ -10,7 +10,9 @@ use Hobosoft\MegaLoader\Tests\Classes\NullDatabase;
 use Hobosoft\MegaLoader\Tests\Plugins\TestPlugin\src\TestPlugin;
 use Psr\Log\NullLogger;
 
-define('ROOTPATH', dirname(__DIR__));
+if(!defined('ROOTPATH')) {
+    define('ROOTPATH', dirname(__DIR__));
+}
 require __DIR__.'/../vendor/autoload.php';
 
 function cfg()

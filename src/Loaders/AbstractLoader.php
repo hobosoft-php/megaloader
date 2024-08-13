@@ -24,7 +24,7 @@ abstract class AbstractLoader implements LocatorInterface, LoaderInterface
             else if(is_string($locator)) {
                 $this->locators[$i] = new $locator($this->logger, $this->config);
             }
-            if(($filename = $locator->locate($name)) !== null) {
+            if(($filename = $this->locators[$i]->locate($name)) !== false) {
                 return $filename;
             }
         }

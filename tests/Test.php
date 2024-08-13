@@ -8,6 +8,7 @@ use Psr\Log\NullLogger;
 define('ROOTPATH', dirname(__DIR__));
 require_once __DIR__.'/../vendor/autoload.php';
 
+//$loader = new \Hobosoft\Boot\Tiny\TinyClassloader(new NullLogger(), []);
 $logger = new TinyLogger();
 $config = new Config($logger, null, []);
 

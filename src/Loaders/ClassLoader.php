@@ -2,9 +2,7 @@
 
 namespace Hobosoft\MegaLoader\Loaders;
 
-use Hobosoft\Boot\Boot;
 use Hobosoft\Config\Contracts\ConfigInterface;
-use Hobosoft\MegaLoader\Contracts\LoaderInterface;
 use Hobosoft\MegaLoader\Utils;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 

@@ -36,7 +36,10 @@ class LoaderDelegator extends AbstractLoader
             throw new \Exception("Loader type '$type' does not exist.");
         }
         if($this->loaders[$type] instanceof \Closure) {
-            $this->loaders[$type] = ($this->loaders[$type])($this->logger, $this->config);
+            $this->loaders[$type] = ($this->loaders[$type])();
+        }
+        if(is_string($this->loaders[$type])) {
+            $this->loaders[$type] = new ($this->loaders[$type])($this->logger, $this->config);
         }
         return $this->loaders[$type]->locate($name);
     }

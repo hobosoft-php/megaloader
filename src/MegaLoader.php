@@ -2,11 +2,8 @@
 
 namespace Hobosoft\MegaLoader;
 
-use Closure;
-use Hobosoft\Boot\Boot;
 use Hobosoft\Config\Contracts\ConfigInterface;
 use Hobosoft\MegaLoader\Contracts\LoaderInterface;
-use Hobosoft\MegaLoader\Contracts\LocatorInterface;
 use Hobosoft\MegaLoader\Loaders\CacheLoader;
 use Hobosoft\MegaLoader\Loaders\ClassLoader;
 use Hobosoft\MegaLoader\Loaders\LoaderDelegator;
@@ -30,10 +27,15 @@ class MegaLoader
         private ConfigInterface    $config,
     )
     {
-        Boot::include(__DIR__ . '/Loaders/AbstractLoader.php');
+        /*Boot::include(__DIR__ . '/Loaders/AbstractLoader.php');
         Boot::include(__DIR__ . '/Loaders/ClassLoader.php');
         Boot::include(__DIR__ . '/Locators/AbstractLocator.php');
-        Boot::include(__DIR__ . '/Locators/Psr4Locator.php');
+        Boot::include(__DIR__ . '/Locators/Psr4Locator.php');*/
+        class_exists(ClassMapLocator::class, true);
+        class_exists(ClassLoader::class, true);
+        class_exists(Psr4Locator::class, true);
+        class_exists(Psr0Locator::class, true);
+        class_exists(Utils::class, true);
         $this->config[self::CONFIG_SECTION] = Configuration::process($this->config[self::CONFIG_SECTION]);
         $loaders = [
             'class' => static fn() => new ClassLoader($logger, $config, [
@@ -49,7 +51,7 @@ class MegaLoader
         if((($this->config['cache'] ?? [])['enabled'] ?? false) === true) {
             $this->loader = new CacheLoader($logger, $config, $this->loader);
         }
-        spl_autoload_register([$this, 'load'], true, true);
+        spl_autoload_register([$this, 'load'], true, false);
     }
     
     public function __destruct()

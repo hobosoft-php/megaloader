@@ -14,36 +14,56 @@ class ClassMapLocator extends AbstractLocator
     public function locate(string $className): string|bool
     {
         if(isset($this->cacheFile) === false) {
-            $this->cacheFile = Paths::join(PathEnum::CACHE, MegaLoader::CACHE_SECTION, 'classMap.php');
+            $this->cacheFile = Paths::join(ROOTPATH, PathEnum::CACHE, MegaLoader::CACHE_SECTION, 'classMap.php');
+            if(is_dir(dirname($this->cacheFile)) === false) {
+                mkdir(dirname($this->cacheFile), 0777, true);
+            }
             if(file_exists($this->cacheFile) === false) {
                 $this->map = $this->generateClassMap($this->config[MegaLoader::CONFIG_SECTION]);
-                file_put_contents($this->cacheFile, var_export($this->map, true));
+                if(empty($this->map) === false) {
+                    $items = '';
+                    foreach($this->map as $file) {
+                        $items .= "        '$file',\n";
+                    }
+                    $content = "<?php\n\nreturn [\n".$items."\n];";
+                    file_put_contents($this->cacheFile, $content);
+                }
             }
             else {
                 $this->map = include $this->cacheFile;
             }
         }
-        die("Class ".__CLASS__." is not functional yet.");
+        return $this->map[$className] ?? false;
+        //die("Class ".__CLASS__." is not functional yet.");
     }
 
     private function generateClassMap(array $config): array
     {
         $ret = [];
-        foreach($config as $path) {
-            if(is_file($path) === true) {
+        foreach($config['classMap'] as $path) {
+            if(Paths::isAbsolute($path) === false) {
+                $path = Paths::join(ROOTPATH, $path);
+            }
+            if(is_dir($path) === true) {
+                $ret = $ret + $this->scanPath($path);
+            }
+            else if(is_file($path) === true) {
                 $content = file_get_contents($path);
                 $info = $this->parse($content);
                 $ns = ($info['namespace'] ?? '') . '\\';
                 foreach($info['objects'] as $name) {
-                    $ret[$ns . $name] = $path;
+                    $ret[$ns . $name] = "'$path',";
                 }
             }
         }
         return $ret;
     }
 
-    private function scanPath(string $path): array
+    private function scanPath(string $path, int $depth = 0): array
     {
+        if($depth >= 20) {
+            throw new \Exception("scanPath depth exceeded 20!");
+        }
         $ret = [];
         $files = scandir($path);
         foreach($files as $file) {
@@ -51,10 +71,10 @@ class ClassMapLocator extends AbstractLocator
                 continue;
             }
             if(is_dir(($fn = Paths::join($path, $file)))) {
-                $ret += $this->scanPath($path.$file.'/');
+                $ret += $this->scanPath($fn, $depth + 1);
             }
             else if(is_file($fn) && pathinfo($file, PATHINFO_EXTENSION) === 'php') {
-                $ret += $fn;
+                $ret[] = $fn;
             }
         }
         return $ret;

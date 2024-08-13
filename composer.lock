@@ -334,7 +334,7 @@
             "dist": {
                 "type": "path",
                 "url": "/var/www/html/unnamed-components/boot",
-                "reference": "bcc7150f96b485a5c0a1f4cc094fd58adcccbfcc"
+                "reference": "9743ba2b28874af7908d80a00a64ba856220fbf1"
             },
             "require": {
                 "hobosoft/collection": "*",
@@ -407,7 +407,7 @@
             "dist": {
                 "type": "path",
                 "url": "/var/www/html/unnamed-components/config",
-                "reference": "eb2c5cbf6e162364e966c5e8f104fdc1f3621292"
+                "reference": "7e54e1069be23a668159b14ef24bf2a7a76efaff"
             },
             "require": {
                 "hobosoft/boot": "*",
@@ -554,7 +554,7 @@
             "dist": {
                 "type": "path",
                 "url": "/var/www/html/unnamed-components/fileloaders",
-                "reference": "57043b8491fca62fdbc9d01bceb8ab1b97ecefbd"
+                "reference": "a82a94142005803f52784341b948423c50cff119"
             },
             "require": {
                 "psr/log": "*"
@@ -3185,12 +3185,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "74d6d3972b9fb746ecbe50f7bd9864b10c4c201d"
+                "reference": "b406d22315633c25599f8924142d80c2899ca328"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/74d6d3972b9fb746ecbe50f7bd9864b10c4c201d",
-                "reference": "74d6d3972b9fb746ecbe50f7bd9864b10c4c201d",
+                "url": "https://api.github.com/repos/symfony/console/zipball/b406d22315633c25599f8924142d80c2899ca328",
+                "reference": "b406d22315633c25599f8924142d80c2899ca328",
                 "shasum": ""
             },
             "require": {
@@ -3271,7 +3271,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-08-09T14:39:52+00:00"
+            "time": "2024-08-13T14:27:37+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -3413,12 +3413,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "cc9d8805c17e1e94a6855af33bf3540b07d90d6e"
+                "reference": "d7eb6daf8cd7e9ac4976e9576b32042ef7253453"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/cc9d8805c17e1e94a6855af33bf3540b07d90d6e",
-                "reference": "cc9d8805c17e1e94a6855af33bf3540b07d90d6e",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/d7eb6daf8cd7e9ac4976e9576b32042ef7253453",
+                "reference": "d7eb6daf8cd7e9ac4976e9576b32042ef7253453",
                 "shasum": ""
             },
             "require": {
@@ -3469,7 +3469,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-08-12T09:55:28+00:00"
+            "time": "2024-08-13T14:27:37+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -4329,6 +4329,7 @@
     "stability-flags": {
         "psr/log": 20,
         "psr/simple-cache": 20,
+        "symfony/yaml": 20,
         "laminas/laminas-loader": 20
     },
     "prefer-stable": false,
