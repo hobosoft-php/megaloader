@@ -6,7 +6,7 @@ use Hobosoft\Boot\PathEnum;
 use Hobosoft\Boot\Paths;
 use Hobosoft\MegaLoader\MegaLoader;
 
-class ClassMapLocator extends AbstractLocator
+class MapLocator extends AbstractLocator
 {
     private string $cacheFile;
     private array $map;

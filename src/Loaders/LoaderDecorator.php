@@ -2,31 +2,28 @@
 
 namespace Hobosoft\MegaLoader\Loaders;
 
+use Hobosoft\Config\Contracts\ConfigInterface;
 use Hobosoft\MegaLoader\Contracts\LoaderInterface;
+use Hobosoft\MegaLoader\Contracts\LocatorInterface;
+use Hobosoft\MegaLoader\MegaLoader;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
-abstract class LoaderDecorator extends AbstractLoader
+abstract class LoaderDecorator extends ClassLoader
 {
     public function __construct(
-        LoaderInterface     $loader,
-        array               $config = [],
-    ) {
-        parent::__construct($loader->getParent(), $config, $config);
-        $this->config = $config;
+        MegaLoader                             $loader,
+        \Closure|LocatorInterface|string|array $locator,
+        private readonly LoaderInterface       $decoratedLoader,
+    )
+    {
+        parent::__construct($loader, $locator);
     }
 
-    public function getLoader(): ?LoaderInterface
+    public function __call(string $name, array $args): mixed
     {
-        return $this->loader;
-    }
-
-    public function setLoader(mixed $loader): void
-    {
-        $this->loader = $loader;
-    }
-
-    public function load(string $className): bool
-    {
-        return $this->loader->loadClass($className);
+        if(method_exists($this->decoratedLoader, $name)) {
+            return call_user_func_array([$this->decoratedLoader, $name], $args);
+        }
+        throw new \BadMethodCallException("Call to undefined method: ".get_class($this->decoratedLoader)."::{$name}");
     }
 }

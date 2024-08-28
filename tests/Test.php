@@ -34,3 +34,5 @@ $config[MegaLoader::CONFIG_SECTION] = [
 $loader = new MegaLoader($logger, $config);
 
 $c = new \Hobosoft\MegaLoader\Tests\Classes\NullDatabase();
+
+$c->method('test');

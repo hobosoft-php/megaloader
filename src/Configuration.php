@@ -9,36 +9,10 @@ use Hobosoft\Config\Schema\Define;
 use Hobosoft\Config\Schema\Exceptions\ValidationException;
 use Hobosoft\Config\Schema\Processor;
 use Hobosoft\Config\Schema\Types\Structure;
-use Hobosoft\MegaLoader\Locators\ClassMapLocator;
+use Hobosoft\MegaLoader\Locators\MapLocator;
 use Hobosoft\MegaLoader\Locators\Psr0Locator;
 use Hobosoft\MegaLoader\Locators\Psr4Locator;
 use stdClass;
-
-/*
-
-    public static function getDefaultConfig(): array
-    {
-        return [
-            'cache' => [
-                'enabled' => true,
-                'backend' => 'fileCache',
-                'prefix' => 'megaloader-'.PHP_SAPI,
-            ],
-            'loaders' => [
-                Psr4Lookup::class,
-                ClassMapLookup::class,
-            ],
-            'lookups' => [
-                Psr0Lookup::class,
-                Psr4Lookup::class,
-                ClassMapLookup::class,
-            ],
-        ];
-    }
-
-
-
- */
 
 class Configuration //implements ConfigurationInterface
 {

@@ -6,6 +6,19 @@ class Psr0Locator extends AbstractLocator
 {
     public function locate(string $className): string|bool
     {
-        die("Class ".__CLASS__." is not functional yet.");
+        $fn = strtr($className, '\\/', '/');
+        $sfn = lcfirst($fn);
+        if(file_exists(($sfn = ROOTPATH . DIRECTORY_SEPARATOR . $sfn . '.php'))) {
+            return $sfn;
+        }
+        foreach(($this->config['megaloader.psr-0'] ?? []) as $k => $v) {
+            $k = strtr($k, '\\/', '/');
+            if(str_starts_with($fn, $k)) {
+                if(file_exists(($sfn = ROOTPATH . DIRECTORY_SEPARATOR . $v . substr($fn, strlen($k)) . '.php'))) {
+                    return $sfn;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -5,31 +5,55 @@ namespace Hobosoft\MegaLoader\Loaders;
 use Hobosoft\Config\Contracts\ConfigInterface;
 use Hobosoft\MegaLoader\Contracts\LoaderInterface;
 use Hobosoft\MegaLoader\Contracts\LocatorInterface;
+use Hobosoft\MegaLoader\Locators\LocatorDelegator;
+use Hobosoft\MegaLoader\MegaLoader;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
 abstract class AbstractLoader implements LocatorInterface, LoaderInterface
 {
+    const string TYPE = 'unknown';
+
     public function __construct(
-        protected PsrLoggerInterface $logger,
-        protected ConfigInterface    $config,
-        protected array              $locators = [],
-    ) {}
+        protected MegaLoader                           $parent,
+        private \Closure|LocatorInterface|string|array $locator,
+    )
+    {
+    }
+
+    protected function getLogger(): PsrLoggerInterface
+    {
+        return $this->parent->getLogger();
+    }
+
+    protected function getConfig(): ConfigInterface
+    {
+        return $this->parent->getConfig();
+    }
+
+    protected function getLocator(): LocatorInterface
+    {
+        return ($this->locator = match(true) {
+            $this->locator instanceof LocatorInterface => $this->locator,
+            $this->locator instanceof \Closure => ($this->locator)($this->parent),
+            is_string($this->locator) => new ($this->locator)($this->parent),
+            default => throw new \Exception("Locator var is unknown type."),
+        });
+    }
+
+    protected function setLocator(\Closure|LocatorInterface|string|array $loader): void
+    {
+        $this->locator = $loader;
+    }
 
     public function locate(string $name): string|bool
     {
-        foreach ($this->locators as $i => $locator) {
-            if($locator instanceof \Closure) {
-                $this->locators[$i] = $locator();
-            }
-            else if(is_string($locator)) {
-                $this->locators[$i] = new $locator($this->logger, $this->config);
-            }
-            if(($filename = $this->locators[$i]->locate($name)) !== false) {
-                return $filename;
-            }
-        }
-        return false;
+        return $this->getLocator()->locate($name);
     }
 
-    //abstract public function load(string $name): bool;
+    abstract public function load(string $name): bool;
+
+    public function getType(): string
+    {
+        return static::TYPE;
+    }
 }

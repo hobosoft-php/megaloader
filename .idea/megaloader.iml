@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" packagePrefix="Hobosoft\MegaLoader\" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="false" packagePrefix="Hobosoft\MegaLoader\Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/tests/Plugins/TestPlugin/src" isTestSource="false" packagePrefix="Hobosoft\TestPlugin\" />
+      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/vendor" />
       <excludeFolder url="file://$MODULE_DIR$/tests/Plugins/TestPlugin/vendor/composer" />

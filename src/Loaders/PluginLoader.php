@@ -8,6 +8,8 @@ use Hobosoft\FileLoaders\Loaders;
 
 class PluginLoader extends AbstractLoader
 {
+    const string TYPE = 'plugin';
+
     public function load(string $name): bool
     {
         // TODO: Implement load() method.

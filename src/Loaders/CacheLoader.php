@@ -2,11 +2,12 @@
 
 namespace Hobosoft\MegaLoader\Loaders;
 
-use Hobosoft\Config\Contracts\ConfigInterface;
 use Hobosoft\MegaLoader\Contracts\LoaderInterface;
+use Hobosoft\MegaLoader\Contracts\LocatorInterface;
+use Hobosoft\MegaLoader\MegaLoader;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
-class CacheLoader extends AbstractLoader
+class CacheLoader extends LoaderDecorator
 {
     const string CLASSES_FILENAME = 'classes.inc';
 
@@ -14,17 +15,17 @@ class CacheLoader extends AbstractLoader
     protected string $path;
 
     public function __construct(
-        PsrLoggerInterface      $logger,
-        ConfigInterface         $config,
-        private LoaderInterface $decorated,
+        MegaLoader                             $parent,
+        \Closure|LocatorInterface|string|array $locator,
+        private LoaderInterface                $decorated,
     )
     {
-        parent::__construct($logger, $config);
-        $this->path = $config['cache']['path'];
+        parent::__construct($parent, $locator);
+        $this->path = $this->getConfig()['cache']['path'];
         if (!is_dir($this->path) && !mkdir($this->path, 0777, true) && !is_dir($this->path)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->path));
         }
-        $this->classes = file_exists(($fn = $this->path.'/classes.inc')) ? include $fn : [];
+        //$this->classes = file_exists(($fn = $this->path.'/classes.inc')) ? include $fn : [];
     }
 
     public function __destruct()
@@ -40,17 +41,11 @@ class CacheLoader extends AbstractLoader
 
     public function locate(string $name): string|bool
     {
-        if(array_key_exists($name, $this->classes)) {
-            return $this->classes[$name];
-        }
-        if(($ret = $this->decorated->locate($name)) !== null) {
-            return ($this->classes[$name] = $ret);
-        }
-        return false;
+        return $this->decorated->locate($name);
     }
 
     public function load(string $name): bool
     {
-        return $this->decorated->load($this->locate($name));
+        return $this->decorated->load($name);
     }
 }
