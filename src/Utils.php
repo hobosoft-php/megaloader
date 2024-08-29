@@ -14,8 +14,9 @@ class Utils
 
     protected static bool $registered = false;
 
-    public static function includeFile(string $fn): bool
+    public static function includeFile(string $fn, int $flags = 0): bool
     {
+        print("includeFile: $fn\n");
         if(self::$registered === false) {
             self::$registered = true;
             $fn = Paths::join(ROOTPATH, PathEnum::VAR, 'debug/included_files-megaloader.txt');
@@ -61,12 +62,28 @@ class Utils
         return true;
     }
 
+    const int NO_EXCEPTION_ON_FAILURE = 1;
+    const int ALLOW_RECURSIVE_GLOB = 2;
+    const int ALLOW_GLOB = 4;
+
+    public static function includeArray(array $fileList, string $basePath = null, int $flags = 0): bool
+    {
+        for($i=0, $max=count($fileList); $i<$max; $i++) {
+            $fn = $fileList[$i];
+            if((is_array($fn) ? self::includeArray($fn, $basePath) : self::includeFile($fn)) === false) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /*
     public static function include(string|array $fileList, string $basePath = null): bool
     {
         $fileList = is_array($fileList) ? $fileList : [$fileList];
+        print_r($fileList);
         while(!empty($fileList)) {
-            if(is_array(($fn = array_shift($fileList)
-            ))) {
+            if(is_array(($fn = array_shift($fileList)))) {
                 $fileList = array_merge($fileList, $fn);
                 continue;
             }
@@ -77,6 +94,7 @@ class Utils
         }
         return true;
     }
+    */
 
     public static function fullPathGlob(string $filter, string $basePath = ''): array
     {

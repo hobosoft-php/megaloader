@@ -24,7 +24,7 @@ use Hobosoft\Plugin\Manifest\Types\Loader;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
 include __DIR__.'/Utils.php';
-Utils::include([
+Utils::includeArray([
     Utils::fullPathGlob('Contracts/*.php', __DIR__),
     Utils::fullPathGlob('Exceptions/*.php', __DIR__),
     'Composer/Composer.php',
