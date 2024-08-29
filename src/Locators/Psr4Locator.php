@@ -2,21 +2,35 @@
 
 namespace Hobosoft\MegaLoader\Locators;
 
+use Hobosoft\Boot\Paths;
+use Hobosoft\MegaLoader\MegaLoader;
+
 class Psr4Locator extends AbstractLocator
 {
-    public function locate(string $className): string|bool
+    protected function makeFilename(string $basePath, string $className, string $search, string|array $replace): string|bool
     {
-        $fn = strtr($className, '\\/', '/');
-        $sfn = lcfirst($fn);
-        if(file_exists(($sfn = ROOTPATH . DIRECTORY_SEPARATOR . $sfn . '.php'))) {
-            return $sfn;
+        if($search === 'Hobosoft\\MegaLoader\\') {
+            print("");
         }
-        foreach(($this->config['megaloader.psr-4'] ?? []) as $k => $v) {
-            $k = strtr($k, '\\/', '/');
-            if(str_starts_with($fn, $k)) {
-                if(file_exists(($sfn = ROOTPATH . DIRECTORY_SEPARATOR . $v . substr($fn, strlen($k)) . '.php'))) {
-                    return $sfn;
+        if(str_starts_with($className, $search)) {
+            $replace = is_string($replace) ? [$replace] : $replace;
+            $tail = substr(strtr($className, '\\/', DIRECTORY_SEPARATOR), strlen($search)) . '.php';
+            while(!empty($replace)) {
+                $entry = array_shift($replace);
+                $root = ($entry[0] === '/') ? $entry : Paths::join(ROOTPATH, $entry);
+                if(file_exists(($fn = Paths::join($root, $tail)))) {
+                    return $fn;
                 }
+            }
+        }
+        return false;
+    }
+
+    public function locate(string $name): string|bool
+    {
+        foreach(($this->loader->getConfig()[$this->configSection.'.psr-4'] ?? []) as $k => $v) {
+            if(($filename = $this->makeFilename(ROOTPATH, $name, $k, $v)) !== false) {
+                return $filename;
             }
         }
         return false;

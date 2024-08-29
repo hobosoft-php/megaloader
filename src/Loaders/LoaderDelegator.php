@@ -9,7 +9,7 @@ use Hobosoft\MegaLoader\Locators\LocatorDelegator;
 use Hobosoft\MegaLoader\MegaLoader;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
-class LoaderDelegator extends ClassLoader
+class LoaderDelegator extends AbstractLoader
 {
     protected array $loaders = [];
 
@@ -20,8 +20,8 @@ class LoaderDelegator extends ClassLoader
     {
         parent::__construct($parent, $this);
         foreach ($loaders as $loader => $locators) {
-            $type = constant($loader . '::TYPE');
-            $this->register($loader, $locators, $type);
+            $this->register($loader, $locators, constant($loader . '::TYPE'));
+            print(__METHOD__ . ":  Registered loader '$loader' with locators:  " . implode(', ', is_string($locators) ? [$locators] : $locators) . ".\n");
         }
     }
 
@@ -32,8 +32,7 @@ class LoaderDelegator extends ClassLoader
         }
 
         $locator = match(true) {
-            $locator instanceof LocatorInterface => $locator,
-            $locator instanceof \Closure => $locator,
+            $locator instanceof LocatorInterface, $locator instanceof \Closure => $locator,
             is_string($locator) => static fn($pa) => new ($locator)($pa),
             is_array($locator) => static fn($pa) => new LocatorDelegator($pa, $locator),
         };
@@ -50,37 +49,27 @@ class LoaderDelegator extends ClassLoader
         };
 
         if($type === '') {
-            ;
             $type = constant(($loader = ($loader instanceof \Closure) ? ($loader)($this->parent) : $loader) . '::TYPE');
         }
 
         $this->loaders[$type] = $loader;
+    }
 
-        /*
-        if(is_string($loader)) {
-            $type = ($type === '') ? constant($loader . '::TYPE') : $type;
-            $loader = static fn($th) => new ($loader)($th, $locator);
+    public function getLoaderByType(string $type): LoaderInterface|bool
+    {
+        return $this->loaders[$type] ?? false;
+    }
+
+    public function replaceType(string $type, \Closure|LoaderInterface|string $newLoader): void
+    {
+        if(array_key_exists($type, $this->loaders) === false) {
+            throw new \Exception("Loader type '$type' does not exist.");
         }
-
-        if(is_array($loader)) {
-            if(count($loader) > 1) {
-                throw new \Exception("Cannot register arrays, array is for '[ loader => [ locators... ]]' format.");
-            }
-            foreach($loader as $loaderClass => $locatorClasses) {
-                $type = ($type === '') ? constant($loaderClass . '::TYPE') : $type;
-                $loader = static fn($th) => new ($loaderClass)($th, $locatorClasses);
-            }
+        if(is_string($newLoader) !== false) {
+            $newLoader = static fn($th) => new ($newLoader)($th);
         }
-
-        if($loader instanceof \Closure) {
-            $loader = ($loader)($this->parent);
-        }
-
-        if($loader instanceof LocatorInterface) {
-            $loader = $loader;
-        }*/
-
-       // $this->loaders[$type] = $loader;
+        $this->loaders[$type] = $newLoader;
+        print("Replaced loader for type '$type' with new loader.\n");
     }
 
     public function locate(string $name, string $type = 'class'): string|bool
@@ -88,30 +77,24 @@ class LoaderDelegator extends ClassLoader
         if(array_key_exists($type, $this->loaders) === false) {
             throw new \Exception("Loader type '$type' does not exist.");
         }
-
-        if($this->loaders[$type] instanceof \Closure) {
+        else if($this->loaders[$type] instanceof \Closure) {
             $this->loaders[$type] = ($this->loaders[$type])($this->parent);
         }
 
+        print(__METHOD__ . ": Locating '$name' of type '$type'...");
         return $this->loaders[$type]->locate($name, $type);
-
-        $arr = $this->loaders[$type];
-        foreach($arr as $locator) {
-            //if(($path = $locator->locate($name, $type)) !== false) {
-            //    return $path;
-            //}
-        }
-        return false;
     }
 
     public function load(string $name, string $type = 'class'): bool
     {
-        if(($fn = $this->locate($name, $type)) === false) {
-            return false;
+        if(array_key_exists($type, $this->loaders) === false) {
+            throw new \Exception("Loader type '$type' does not exist.");
         }
-        if(($arr = $this->loaders[$type]->load($fn)) !== null) {
-            return $arr;
+        else if($this->loaders[$type] instanceof \Closure) {
+            $this->loaders[$type] = ($this->loaders[$type])($this->parent);
         }
-        return false;
+
+        print(__METHOD__ . ": Loading class '$name' of type '$type'...\n");
+        return $this->loaders[$type]->load($name, $type);
     }
 }

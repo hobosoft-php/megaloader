@@ -5,10 +5,52 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" packagePrefix="Hobosoft\MegaLoader\" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="false" packagePrefix="Hobosoft\MegaLoader\Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/tests/Plugins/TestPlugin/src" isTestSource="false" packagePrefix="Hobosoft\TestPlugin\" />
-      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor" />
       <excludeFolder url="file://$MODULE_DIR$/tests/Plugins/TestPlugin/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/brianium" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/carbonphp" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/fidry" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/filp" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/hobosoft/boot" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/hobosoft/collection" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/hobosoft/config" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/hobosoft/container" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/hobosoft/errorhandler" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/hobosoft/eventdispatch" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/hobosoft/eventloop" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/hobosoft/fileloaders" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/hobosoft/finders" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/hobosoft/kernel" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/hobosoft/logger" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/hobosoft/plugin" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/jean85" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/laminas" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/myclabs" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/nesbot" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/nikic" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/nunomaduro" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pestphp" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phar-io" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpdocumentor" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpunit" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/sebastian" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/smeghead" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/spatie" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/ta-tikoma" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/theseer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/tracy" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/voku" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/webmozart" />
+      <excludeFolder url="file://$MODULE_DIR$/var" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor" />
+      <excludePattern pattern="*/vendor/*/*/vendor/*" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

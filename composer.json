@@ -16,13 +16,17 @@
         "psr/simple-cache": "^3.0@dev",
         "hobosoft/boot": "*",
         "hobosoft/config": "*",
+        "hobosoft/fileloaders": "*",
+        "hobosoft/finders": "*",
+        "symfony/yaml": "7.2.x-dev",
         "ext-apcu": "*",
-        "hobosoft/fileloaders": "^1.0",
-        "symfony/yaml": "7.2.x-dev"
+        "filp/whoops": "^2.15"
     },
     "require-dev": {
         "laminas/laminas-loader": "2.11.x-dev",
-        "phpunit/php-code-coverage": "*"
+        "phpunit/php-code-coverage": "*",
+        "smeghead/php-class-diagram": "*",
+        "tracy/tracy": "*"
     },
     "config": {
         "allow-plugins": {

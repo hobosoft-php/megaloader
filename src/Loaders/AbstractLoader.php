@@ -7,6 +7,7 @@ use Hobosoft\MegaLoader\Contracts\LoaderInterface;
 use Hobosoft\MegaLoader\Contracts\LocatorInterface;
 use Hobosoft\MegaLoader\Locators\LocatorDelegator;
 use Hobosoft\MegaLoader\MegaLoader;
+use Hobosoft\MegaLoader\Utils;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
 abstract class AbstractLoader implements LocatorInterface, LoaderInterface
@@ -20,6 +21,11 @@ abstract class AbstractLoader implements LocatorInterface, LoaderInterface
     {
     }
 
+    public function getType(): string
+    {
+        return static::TYPE;
+    }
+
     protected function getLogger(): PsrLoggerInterface
     {
         return $this->parent->getLogger();
@@ -30,7 +36,7 @@ abstract class AbstractLoader implements LocatorInterface, LoaderInterface
         return $this->parent->getConfig();
     }
 
-    protected function getLocator(): LocatorInterface
+    public function getLocator(): LocatorInterface
     {
         return ($this->locator = match(true) {
             $this->locator instanceof LocatorInterface => $this->locator,
@@ -40,7 +46,7 @@ abstract class AbstractLoader implements LocatorInterface, LoaderInterface
         });
     }
 
-    protected function setLocator(\Closure|LocatorInterface|string|array $loader): void
+    public function setLocator(\Closure|LocatorInterface|string|array $loader): void
     {
         $this->locator = $loader;
     }
@@ -51,9 +57,4 @@ abstract class AbstractLoader implements LocatorInterface, LoaderInterface
     }
 
     abstract public function load(string $name): bool;
-
-    public function getType(): string
-    {
-        return static::TYPE;
-    }
 }

@@ -11,15 +11,16 @@ class MapLocator extends AbstractLocator
     private string $cacheFile;
     private array $map;
 
-    public function locate(string $className): string|bool
+    public function locate(string $name): string|bool
     {
+        return false;
         if(isset($this->cacheFile) === false) {
             $this->cacheFile = Paths::join(ROOTPATH, PathEnum::CACHE, MegaLoader::CACHE_SECTION, 'classMap.php');
             if(is_dir(dirname($this->cacheFile)) === false) {
                 mkdir(dirname($this->cacheFile), 0777, true);
             }
             if(file_exists($this->cacheFile) === false) {
-                $this->map = $this->generateClassMap($this->config[MegaLoader::CONFIG_SECTION]);
+                $this->map = $this->generateClassMap($this->config[$this->configSection]);
                 if(empty($this->map) === false) {
                     $items = '';
                     foreach($this->map as $file) {
@@ -33,7 +34,7 @@ class MapLocator extends AbstractLocator
                 $this->map = include $this->cacheFile;
             }
         }
-        return $this->map[$className] ?? false;
+        return $this->map[$name] ?? false;
         //die("Class ".__CLASS__." is not functional yet.");
     }
 

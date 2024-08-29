@@ -4,7 +4,7 @@ namespace Hobosoft\MegaLoader\Loaders;
 
 enum LoaderTypes: int
 {
-    case CLASS = 0;
+    case CLASSES = 0;
     case PLUGIN = 1;
     case MODULE = 2;
     case FUNCTION = 3;

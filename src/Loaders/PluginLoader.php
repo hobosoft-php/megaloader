@@ -10,12 +10,6 @@ class PluginLoader extends AbstractLoader
 {
     const string TYPE = 'plugin';
 
-    public function load(string $name): bool
-    {
-        // TODO: Implement load() method.
-        return false;
-    }
-
     public function locate(string $name): string|bool
     {
         foreach($this->config['megaloader.plugins'] as $namespace => $path) {
@@ -28,6 +22,12 @@ class PluginLoader extends AbstractLoader
                 print_r($manifest);
             }
         }
+        return false;
+    }
+
+    public function load(string $name): bool
+    {
+        // TODO: Implement load() method.
         return false;
     }
 }

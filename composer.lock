@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9d304193b895f0e0cdf8640a19c21279",
+    "content-hash": "5b2be64615e1c8bb969a0e44c6481338",
     "packages": [
         {
             "name": "brianium/paratest",
@@ -696,11 +696,14 @@
         },
         {
             "name": "hobosoft/finders",
-            "version": "dev-main",
+            "version": "1.0.0",
             "dist": {
                 "type": "path",
                 "url": "/var/www/projects/unnamed-framework-components/finders",
-                "reference": "4060ff99126df2a097ef970c0e1b8ae43bac3e0a"
+                "reference": "2458c28bff78c081460394ca2d8f89d34e9aff56"
+            },
+            "require": {
+                "hobosoft/boot": "^1.0"
             },
             "type": "library",
             "autoload": {
@@ -722,14 +725,15 @@
             "dist": {
                 "type": "path",
                 "url": "/var/www/projects/unnamed-framework-components/kernel",
-                "reference": "9cf760a8ac167ca53c57d155c734ef3cd5e6bbff"
+                "reference": "a51bc920b732a882b77f40b5f527ab64ba0a3103"
             },
             "require": {
                 "hobosoft/config": "*",
                 "hobosoft/logger": "*",
                 "hobosoft/megaloader": "*",
                 "pestphp/pest": "*",
-                "psr/event-dispatcher": "*"
+                "psr/event-dispatcher": "*",
+                "smeghead/php-class-diagram": "*"
             },
             "type": "library",
             "autoload": {
@@ -782,17 +786,19 @@
             "dist": {
                 "type": "path",
                 "url": "/var/www/projects/unnamed-framework-components/plugin",
-                "reference": "3717b2099f372eea72dc9eab3f2868d1aa780c4f"
+                "reference": "b9710693256bd1483708bba1dc38380f1dc6c445"
             },
             "require": {
                 "hobosoft/config": "*",
                 "hobosoft/eventdispatch": "*",
                 "hobosoft/fileloaders": "*",
                 "hobosoft/finders": "*",
-                "hobosoft/kernel": "*"
+                "hobosoft/kernel": "*",
+                "hobosoft/megaloader": "^1.0"
             },
             "require-dev": {
-                "pestphp/pest": "*"
+                "pestphp/pest": "*",
+                "smeghead/php-class-diagram": "*"
             },
             "type": "library",
             "autoload": {
@@ -1605,12 +1611,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pestphp/pest.git",
-                "reference": "ecdbe7a4723f1c434dab253594f9bc4753077918"
+                "reference": "5ae5ac9a54112358e96cdbd8250af4d37d8363ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pestphp/pest/zipball/ecdbe7a4723f1c434dab253594f9bc4753077918",
-                "reference": "ecdbe7a4723f1c434dab253594f9bc4753077918",
+                "url": "https://api.github.com/repos/pestphp/pest/zipball/5ae5ac9a54112358e96cdbd8250af4d37d8363ab",
+                "reference": "5ae5ac9a54112358e96cdbd8250af4d37d8363ab",
                 "shasum": ""
             },
             "require": {
@@ -1705,7 +1711,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-08-22T20:36:19+00:00"
+            "time": "2024-08-28T21:30:29+00:00"
         },
         {
             "name": "pestphp/pest-plugin",
@@ -2523,12 +2529,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "39448936fe923265a2d37740dca69da2f3dd0a25"
+                "reference": "b2b0f0f1076b6a0576496886ceb1237823f3017a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/39448936fe923265a2d37740dca69da2f3dd0a25",
-                "reference": "39448936fe923265a2d37740dca69da2f3dd0a25",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b2b0f0f1076b6a0576496886ceb1237823f3017a",
+                "reference": "b2b0f0f1076b6a0576496886ceb1237823f3017a",
                 "shasum": ""
             },
             "require": {
@@ -2616,7 +2622,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-08-28T07:50:48+00:00"
+            "time": "2024-08-28T12:51:03+00:00"
         },
         {
             "name": "psr/clock",
@@ -3815,6 +3821,61 @@
             "time": "2024-07-15T07:12:03+00:00"
         },
         {
+            "name": "smeghead/php-class-diagram",
+            "version": "dev-dependabot/composer/nikic/php-parser-tw-4.13or-tw-5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smeghead/php-class-diagram.git",
+                "reference": "655e1b4e8f24e2163d66aae9bc3ff0693f7c34ac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smeghead/php-class-diagram/zipball/655e1b4e8f24e2163d66aae9bc3ff0693f7c34ac",
+                "reference": "655e1b4e8f24e2163d66aae9bc3ff0693f7c34ac",
+                "shasum": ""
+            },
+            "require": {
+                "nikic/php-parser": "^4.13 || ^5.0",
+                "php": ">=8.0",
+                "phpstan/phpdoc-parser": "^1.23",
+                "symfony/finder": "^5.3|^6.0"
+            },
+            "require-dev": {
+                "clue/phar-composer": "^1.2",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^9.5"
+            },
+            "bin": [
+                "bin/php-class-diagram"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Smeghead\\PhpClassDiagram\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "smeghead",
+                    "email": "smeghead7@gmail.com"
+                }
+            ],
+            "description": "A CLI tool that parses the PHP source directory and outputs PlantUML scripts.",
+            "keywords": [
+                "classdiagram",
+                "plantuml"
+            ],
+            "support": {
+                "issues": "https://github.com/smeghead/php-class-diagram/issues",
+                "source": "https://github.com/smeghead/php-class-diagram/tree/dependabot/composer/nikic/php-parser-tw-4.13or-tw-5.0"
+            },
+            "time": "2024-01-08T14:16:47+00:00"
+        },
+        {
             "name": "spatie/backtrace",
             "version": "1.6.2",
             "source": {
@@ -4340,23 +4401,23 @@
         },
         {
             "name": "symfony/finder",
-            "version": "7.2.x-dev",
+            "version": "6.4.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "0470b8dc10ca08d23aeaabbed5b961c928e4d89d"
+                "reference": "d7eb6daf8cd7e9ac4976e9576b32042ef7253453"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/0470b8dc10ca08d23aeaabbed5b961c928e4d89d",
-                "reference": "0470b8dc10ca08d23aeaabbed5b961c928e4d89d",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/d7eb6daf8cd7e9ac4976e9576b32042ef7253453",
+                "reference": "d7eb6daf8cd7e9ac4976e9576b32042ef7253453",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.2"
+                "php": ">=8.1"
             },
             "require-dev": {
-                "symfony/filesystem": "^6.4|^7.0"
+                "symfony/filesystem": "^6.0|^7.0"
             },
             "type": "library",
             "autoload": {
@@ -4384,7 +4445,7 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/finder/tree/7.2"
+                "source": "https://github.com/symfony/finder/tree/6.4"
             },
             "funding": [
                 {
@@ -4400,7 +4461,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-08-13T14:29:53+00:00"
+            "time": "2024-08-13T14:27:37+00:00"
         },
         {
             "name": "symfony/http-foundation",

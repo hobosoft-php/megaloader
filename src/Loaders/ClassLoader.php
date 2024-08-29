@@ -14,8 +14,6 @@ class ClassLoader extends AbstractLoader
 
     public function load(string $name): bool
     {
-        print("loading class '$name'.\n");
-        Utils::include($name);
-        return true;
+        return ($located = $this->locate($name)) && Utils::include($located);
     }
 }

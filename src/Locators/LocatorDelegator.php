@@ -28,29 +28,16 @@ class LocatorDelegator extends AbstractLocator
         }
     }
 
-    public function locate(string $name, string $type = 'class'): string|bool
+    public function locate(string $name): string|bool
     {
         foreach ($this->locators as &$locator) {
             if($locator instanceof \Closure) {
                 $locator = ($locator)($this->loader);
             }
-            if (($path = $locator->locate($name, $type)) !== false) {
+            if (($path = $locator->locate($name)) !== false) {
                 return $path;
             }
         }
         return false;
-
-        if(isset($this->locators[$type]) === false) {
-            throw new \Exception("No locator is available for type $type");
-        }
-        if(($this->locators[$type] instanceof LocatorInterface) === false) {
-            $this->locators[$type] = match(true) {
-                $this->locators[$type] instanceof \Closure => ($this->locators[$type])($this->loader),
-                is_callable($this->locators[$type]) => call_user_func($this->locators[$type], $this->loader),
-                is_string($this->locators[$type]) => new ($this->locators[$type])($this->loader),
-                default => throw new \Exception("Locator for '$type' is not the correct variable type."),
-            };
-        }
-        return $this->locators[$type]->locate($name);
     }
 }

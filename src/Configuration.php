@@ -31,6 +31,7 @@ class Configuration //implements ConfigurationInterface
                 };
             };
             self::$schema = Define::structure([
+                'prepend' => Define::bool('true'),
                 'cache' => Define::structure([
                     'enabled' => Define::anyOf('true', 'false', true, false, 1, 0)->castTo('bool')->default(false)->transform($transformCacheEnabled),
                     'backend' => Define::string('FileCache'),
@@ -38,10 +39,10 @@ class Configuration //implements ConfigurationInterface
                 ])->castTo('array'),
                 'psr-0' => Define::arrayOf('string', 'string'),
                 'psr-4' => Define::arrayOf('string', 'string'),
-                'classMap' => Define::listOf('string')->description('Source files/directories to be scanned to make the class map.'),
-                'plugins' => Define::arrayOf('string', 'string')->description('Array of plugin namespace prefix => plugin path'),
-                'modules' => Define::arrayOf('string', 'string')->description('Array of module namespace prefix => module path'),
-            ]);
+                'files' => Define::listOf('string')->description('Source files/directories to be included when autoloader loads.'),
+                'classmap' => Define::listOf('string')->description('Source files/directories to be scanned to make the class map.'),
+                'exclude-from-classmap' => Define::listOf('string')->description('Source files/directories to be excluded from the class map.'),
+            ])->castTo('array');
         }
         return self::$schema;
     }
@@ -59,7 +60,7 @@ class Configuration //implements ConfigurationInterface
         } catch (ValidationException $e) {
             echo 'Data is invalid: ' . $e->getMessage();
         }
-        return self::stdToArray($normalized);
+        return is_array($normalized) ? $normalized : self::stdToArray($normalized);
     }
 
     private static function stdToArray(stdClass $std): array
