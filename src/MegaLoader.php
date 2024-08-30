@@ -2,107 +2,110 @@
 
 namespace Hobosoft\MegaLoader;
 
-use Hobosoft\Boot\Paths;
-use Hobosoft\Config\Config;
-use Hobosoft\Config\Contracts\ConfigInterface;
-use Hobosoft\FileLoaders\Loader\DelegatingLoader;
-use Hobosoft\FileLoaders\Loader\FileLocator;
+use Closure;
+use Hobosoft\MegaLoader\Composer\Composer;
 use Hobosoft\MegaLoader\Contracts\LoaderInterface;
-use Hobosoft\MegaLoader\Loaders\AbstractLoader;
-use Hobosoft\MegaLoader\Loaders\CacheLoader;
+use Hobosoft\MegaLoader\Contracts\LocatorInterface;
+use Hobosoft\MegaLoader\Contracts\ResolvingLoaderInterface;
+use Hobosoft\MegaLoader\Contracts\ResolvingLocatorInterface;
+use Hobosoft\MegaLoader\Decorators\CacheLocatorDecorator;
 use Hobosoft\MegaLoader\Loaders\ClassLoader;
-use Hobosoft\MegaLoader\Loaders\LoaderDelegator;
-use Hobosoft\MegaLoader\Loaders\LoaderTypes;
-use Hobosoft\MegaLoader\Loaders\PluginLoader;
-use Hobosoft\MegaLoader\Locators\FinderLocator;
-use Hobosoft\MegaLoader\Locators\LocatorDelegator;
-use Hobosoft\MegaLoader\Locators\MapLocator;
-use Hobosoft\MegaLoader\Locators\PluginLocator;
-use Hobosoft\MegaLoader\Locators\Psr0Locator;
-use Hobosoft\MegaLoader\Locators\Psr4Locator;
-use Hobosoft\Plugin\Manifest\Types\Loader;
+use Hobosoft\MegaLoader\Traits\LocatorTraits;
+use Hobosoft\MegaLoader\Traits\LoaderTraits;
+use Hobosoft\MegaLoader\Traits\ResolverTraits;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
-
-include __DIR__.'/Utils.php';
-Utils::includeArray([
-    Utils::fullPathGlob('Contracts/*.php', __DIR__),
-    Utils::fullPathGlob('Exceptions/*.php', __DIR__),
-    'Composer/Composer.php',
-    'Composer/ComposerJson.php',
-    'Loaders/AbstractLoader.php',
-    'Loaders/LoaderTypes.php',
-    'Loaders/LoaderDelegator.php',
-    'Loaders/LoaderDecorator.php',
-    'Loaders/ClassLoader.php',
-    'Loaders/CacheLoader.php',
-    'Loaders/PluginLoader.php',
-    'Locators/AbstractLocator.php',
-    'Locators/LocatorDelegator.php',
-    'Locators/ComposerLocator.php',
-    'Locators/MapLocator.php',
-    'Locators/Psr0Locator.php',
-    'Locators/Psr4Locator.php',
-    'Locators/FinderLocator.php',
-    'Configuration.php',
-], __DIR__);
 
 class MegaLoader implements LoaderInterface
 {
-    const string CONFIG_SECTION = 'megaloader';
+    //const string CONFIG_SECTION = 'megaloader';
     const string CACHE_SECTION = 'megaloader-' . PHP_SAPI;
 
-    private array $types = [];
-    protected LoaderInterface $loader;
+    //private array $types = [];
+    protected ResolvingLoaderInterface   $loaderResolver;
+    protected ResolvingLocatorInterface  $locatorResolver;
+    protected ?MiniLoader                $miniLoader = null;
+    protected ?Composer                  $composer = null;
+    private static ?string               $rootPath = null;
 
     public function __construct(
-        private PsrLoggerInterface $logger,
-        private ConfigInterface    $config,
+        protected ?MiniLogger         $logger = null,
+        protected ?MiniConfig         $config = null,
+        string                        $rootPath = null,
+        mixed                         $miniLoader = null,
+        bool                          $disableMiniLoader = true,
     )
     {
-/*        include 'Utils.php';
-        $preload = [
-            Utils::fullPathGlob('Contracts/*.php', __DIR__),
-            Utils::fullPathGlob('Exceptions/*.php', __DIR__),
-            'Composer/Composer.php',
-            'Composer/ComposerJson.php',
-            'Loaders/AbstractLoader.php',
-            'Loaders/LoaderTypes.php',
-            'Loaders/LoaderDelegator.php',
-            'Loaders/LoaderDecorator.php',
-            'Loaders/ClassLoader.php',
-            'Loaders/CacheLoader.php',
-            'Loaders/PluginLoader.php',
-            'Locators/AbstractLocator.php',
-            'Locators/LocatorDelegator.php',
-            'Locators/ComposerLocator.php',
-            'Locators/MapLocator.php',
-            'Locators/Psr0Locator.php',
-            'Locators/Psr4Locator.php',
-            'Locators/FinderLocator.php',
-            'Configuration.php',
-        ];
-        array_walk($preload, function ($fn, $key, $dir) {
-            if (is_string($fn) && Paths::isAbsolute($fn) === false) {
-                $fn = Paths::join($dir, $fn);
-            }
-            Utils::include($fn);
-        }, __DIR__);*/
+        self::$rootPath = $rootPath;
 
-        $this->types = include __DIR__ . '/Resource/config.php';
-        $this->loader = new LoaderDelegator($this);
-        foreach ($this->types as $loader => $locators) {
-            $type = constant($loader . '::TYPE');
-            $locators = is_string($locators) ? [$locators] : $locators;
-            print("Registered loader '$loader' as type '$type', locators: " . implode(', ', $locators) . "\n");
-            $this->loader->register($loader, $locators, $type);
+        Utils::includeArray([
+            'Contracts/*',
+            'Exceptions/*',
+            'Traits/*',
+            'Composer/*',
+            'Locators/*',
+            'Loaders/*',
+            'Decorators/*',
+        ], __DIR__, Utils::ALLOW_GLOB);
+
+        $this->locatorResolver = new class($config) implements ResolvingLocatorInterface, LocatorInterface {
+            use LocatorTraits, ResolverTraits;
+            public function locate(string $name, mixed $type = null): string|bool
+            {
+                return $this->resolve($name, $type);
+            }
+        };
+
+        $this->loaderResolver = new class($config, $this->locatorResolver) implements ResolvingLoaderInterface, LoaderInterface
+        {
+            use LoaderTraits, ResolverTraits;
+        };
+
+        foreach(($config['locators'] ?? []) as $type => $locators) {
+            foreach($locators as $locator) {
+                $this->locatorResolver->add(Type::fromString($type), $locator);
+            }
         }
-        $this->config[self::CONFIG_SECTION] = Configuration::process($this->config[self::CONFIG_SECTION] ?? []);
-        if ($this->config[self::CONFIG_SECTION . '.cache.enabled'] === true) {
-            $cacheLoader = static fn($th) => new CacheLoader($th, $this->loader->getLoaderByType('class'));
-            $this->loader->replaceType('class', $cacheLoader);
+
+        foreach(($config['loaders'] ?? []) as $type => $loader) {
+            $this->loaderResolver->add(Type::fromString($type), $loader);
+        }
+
+        foreach(($config['decorators'] ?? []) as $type => $decorators) {
+            foreach($decorators as $decorator) {
+                //$this->loaderResolver->add(Type::fromString($type), $loader);
+            }
+        }
+        /*
+        try {
+            $this->config[self::CONFIG_SECTION] = Configuration::process($this->config[self::CONFIG_SECTION] ?? []);
+        }
+        catch (\Exception $e) {
+            print("exception: ".$e->getMessage()."\n");
+        }
+        */
+        if ($this->config['cache']['enabled'] === true) {
+            $this->loaderResolver->decorate(Type::T_CLASS, ClassLoader::class, CacheLocatorDecorator::class);
             print("Cache enabled for megaloader.\n");
         }
-        spl_autoload_register([$this, 'load'], true, !false);
+        spl_autoload_register([$this, 'load'], true, $this->config['prepend'] ?? false);
+        if(is_null($this->logger)) {
+            $this->logger = new MiniLogger();
+            $this->logger->info("Logger created!");
+        }
+        $this->getComposer();
+        if(is_null(($this->miniLoader = $miniLoader)) === false) {
+            if($disableMiniLoader) {
+                $this->miniLoader->unregister();
+            }
+        }
+    }
+
+    public static function getRootPath()
+    {
+        if(is_null(self::$rootPath) === true) {
+            return Utils::getRootPath();
+        }
+        return self::$rootPath;
     }
 
     public function __destruct()
@@ -110,48 +113,50 @@ class MegaLoader implements LoaderInterface
         spl_autoload_unregister([$this, 'load']);
     }
 
-    public function getLogger(): PsrLoggerInterface
+    public function getLogger(): MiniLogger
     {
         return $this->logger;
     }
 
-    public function getConfig(): ConfigInterface
+    public function getConfig(): MiniConfig
     {
         return $this->config;
     }
 
-    public static function defineLoader(string $classname): \Closure
+    public function getComposer(): Composer
     {
-        return static fn($th) => Utils::validateInstance(new $classname($th), LoaderInterface::class);
+        if(is_null($this->composer) === true) {
+            $this->composer = new Composer($this->logger, MegaLoader::getRootPath());
+            $cfg = $this->composer->loadAutoload(MegaLoader::getRootPath());
+            $this->config->set($cfg);
+            Utils::includeArray($cfg['files'] ?? []);
+        }
+        return $this->composer;
     }
 
-    public static function defineLocator(string $classname): \Closure
+    public function getLoaderResolver(): ResolvingLoaderInterface
     {
-        return static fn($th) => new $classname($th);
+        return $this->loaderResolver;
     }
 
-    public static function defineDelegator(string $classname): \Closure
+    public function getLocatorResolver(): ResolvingLocatorInterface
     {
-        return static fn($th) => new $classname($th);
-    }
-
-    public static function defineDecorator(string $classname): \Closure
-    {
-        return static fn($th) => new $classname($th);
-    }
-
-    public function register(\Closure|LoaderInterface|string|array $loader, string $type = LoaderTypes::CLASSES->name): void
-    {
-        $this->loader->register($loader, $type);
+        return $this->locatorResolver;
     }
 
     public function locate(string $name, string $type = 'class'): string|bool
     {
-        return $this->loader->locate($name, $type);
+        return $this->locatorResolver->locate($name, $type);
     }
 
     public function load(string $name, string $type = 'class'): bool
     {
-        return $this->loader->load($name, $type);
+        return $this->loaderResolver->load($name, $type);
+    }
+
+    public function dump(): void
+    {
+        $this->loaderResolver->dump();
+        $this->locatorResolver->dump();
     }
 }

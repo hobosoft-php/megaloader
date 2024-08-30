@@ -4,6 +4,7 @@ use Hobosoft\Boot\PathEnum;
 use Hobosoft\Boot\Paths;
 use Hobosoft\Boot\Tiny\TinyLogger;
 use Hobosoft\Config\Config;
+use Hobosoft\MegaLoader\Utils;
 
 define('ROOTPATH', dirname(__DIR__));
 
@@ -32,7 +33,7 @@ $config[\Hobosoft\MegaLoader\MegaLoader::CONFIG_SECTION] = [
 ];
 
 register_shutdown_function(function () {
-    $p = Paths::join(ROOTPATH, PathEnum::VAR, 'debug/included_files-all.txt');
+    $p = Utils::joinPaths(ROOTPATH, PathEnum::VAR, 'debug/included_files-all.txt');
     file_put_contents($p, print_r(get_included_files(), true));
 });
 

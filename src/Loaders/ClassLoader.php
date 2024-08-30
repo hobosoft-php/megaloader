@@ -2,18 +2,22 @@
 
 namespace Hobosoft\MegaLoader\Loaders;
 
-use Hobosoft\Config\Contracts\ConfigInterface;
+use Hobosoft\MegaLoader\Contracts\LoaderInterface;
 use Hobosoft\MegaLoader\Contracts\LocatorInterface;
-use Hobosoft\MegaLoader\MegaLoader;
+use Hobosoft\MegaLoader\Contracts\ResolverInterface;
+use Hobosoft\MegaLoader\Traits\LoaderTraits;
+use Hobosoft\MegaLoader\Type;
 use Hobosoft\MegaLoader\Utils;
-use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
-class ClassLoader extends AbstractLoader
+/**
+ * @method resolve(string $name, mixed $type)
+ */
+class ClassLoader implements LoaderInterface
 {
-    const string TYPE = 'class';
+    use LoaderTraits;
 
     public function load(string $name): bool
     {
-        return ($located = $this->locate($name)) && Utils::include($located);
+        return ($located = $this->locatorResolver->locate($name, Type::T_CLASS)) && Utils::includeFile($located);
     }
 }

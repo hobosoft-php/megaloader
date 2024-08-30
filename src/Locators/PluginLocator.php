@@ -2,7 +2,9 @@
 
 namespace Hobosoft\MegaLoader\Locators;
 
-class PluginLocator extends AbstractLocator
+use Hobosoft\MegaLoader\Contracts\LocatorInterface;
+
+class PluginLocator implements LocatorInterface
 {
     public function locate(string $pluginName): string|bool
     {

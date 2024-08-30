@@ -1,0 +1,154 @@
+#deptrac:
+#   analyser:
+#      types:
+#         - use
+#         - file
+#         - class
+#
+#   paths:
+#      - src/
+#   exclude_files:
+#      - '#.*test.*#'
+#   layers:
+#      - name: Controller
+#        collectors:
+#           - type: classLike
+#             value: .*Controller.*
+#      - name: Repository
+#        collectors:
+#           - type: classLike
+#             value: .*Repository.*
+#      - name: Service
+#        collectors:
+#           - type: classLike
+#             value: .*Service.*
+#   ruleset:
+#      Controller:
+#         - Service
+#      Service:
+#         - Repository
+#      Repository:
+
+
+deptrac:
+   paths:
+      - ./src
+
+   analyser:
+      internal_tag: "@internal"
+      types:
+         - class
+         - class_superglobal
+         - file
+         - function
+         - function_superglobal
+         - function_call
+
+
+   layers:
+      # Domains
+      - name: Analyser
+        collectors:
+           - type: directory
+             value: src/Core/Analyser/.*
+      - name: Ast
+        collectors:
+           - type: directory
+             value: src/Core/Ast/.*
+           - type: composer
+             private: true
+             composerPath: composer.json
+             composerLockPath: composer.lock
+             packages:
+                - phpstan/phpdoc-parser
+                - nikic/php-parser
+                - phpdocumentor/type-resolver
+      - name: Console
+        collectors:
+           - type: directory
+             value: src/Supportive/Console/.*
+      - name: Dependency
+        collectors:
+           - type: directory
+             value: src/Core/Dependency/.*
+      - name: DependencyInjection
+        collectors:
+           - type: directory
+             value: src/Supportive/DependencyInjection/.*
+      - name: Contract
+        collectors:
+           - type: directory
+             value: src/Contract/.*
+      - name: InputCollector
+        collectors:
+           - type: directory
+             value: src/Core/InputCollector/.*
+      - name: Layer
+        collectors:
+           - type: directory
+             value: src/Core/Layer/.*
+      - name: File
+        collectors:
+           - type: directory
+             value: src/Supportive/File/.*
+      - name: Time
+        collectors:
+           - type: directory
+             value: src/Supportive/Time/.*
+      - name: Supportive
+        collectors:
+           - type: bool
+             must_not:
+                - type: directory
+                  value: src/Supportive/.*/.*
+             must:
+                - type: directory
+                  value: src/Supportive/.*
+      - name: Symfony
+        collectors:
+           - type: composer
+             composerPath: composer.json
+             composerLockPath: composer.lock
+             packages:
+                - symfony/config
+                - symfony/console
+                - symfony/dependency-injection
+                - symfony/event-dispatcher
+                - symfony/filesystem
+                - symfony/finder
+                - symfony/yaml
+
+   ruleset:
+      Layer:
+         - Ast
+         - Symfony
+      Console:
+         - Analyser
+         - OutputFormatter
+         - DependencyInjection
+         - File
+         - Time
+         - Symfony
+      Dependency:
+         - Ast
+      Analyser:
+         - Layer
+         - Dependency
+         - Ast
+         - Symfony
+      OutputFormatter:
+         - DependencyInjection
+         - Symfony
+      Ast:
+         - File
+         - InputCollector
+         - Symfony
+      InputCollector:
+         - File
+         - Symfony
+      DependencyInjection:
+         - Symfony
+      Contract:
+         - Symfony
+      File:
+         - Symfony

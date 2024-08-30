@@ -2,8 +2,9 @@
 
 namespace Hobosoft\MegaLoader\Composer;
 
-use Hobosoft\Boot\Paths;
 use Hobosoft\Finders\FileFinder;
+use Hobosoft\MegaLoader\MegaLoader;
+use Hobosoft\MegaLoader\MiniLogger;
 use Hobosoft\MegaLoader\Utils;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Psr\Log\NullLogger;
@@ -19,23 +20,23 @@ class Composer
     private bool $isLoaded = false;
 
     public function __construct(
-        protected PsrLoggerInterface $logger,
-        protected string             $path,
-        protected int                $pathMaxDepth = -1,
-        protected array              $pathExclude = [],
-        protected array              $namespaceExclude = [],
+        protected PsrLoggerInterface|MiniLogger $logger,
+        protected string                        $path,
+        protected int                           $pathMaxDepth = -1,
+        protected array                         $pathExclude = [],
+        protected array                         $namespaceExclude = [],
     )
     {
         $this->logger ??= new NullLogger();
         $this->composerFiles = [
-            Paths::join(ROOTPATH, 'composer.json') => static fn($fn) => new ComposerJson($fn),
+            Utils::joinPaths(MegaLoader::getRootPath(), 'composer.json') => static fn($fn) => new ComposerJson($fn),
         ];
     }
 
     private function getComposerJson(string $filename = null, bool $allowLoading = false): ComposerJson
     {
         $filename ??= array_key_first($this->composerFiles);
-        $ret = match(true) {
+        $ret = match (true) {
             isset($this->composerFiles[$filename]) => $this->composerFiles[$filename],
             $allowLoading === false => throw new \Exception(__METHOD__ . ":  The file '$filename' doesn't exist in our composer file list (try enabling allowLoading flag)."),
             default => $this->composerFiles[$filename] = new ComposerJson($filename),
@@ -60,9 +61,9 @@ class Composer
     {
         $keys = explode('.', $key);
         $ret = $this->getComposerJson()->toArray();
-        foreach($keys as $k => $v) {
+        foreach ($keys as $k => $v) {
             unset($keys[$k]);
-            if(array_key_exists($v, $ret) === false) {
+            if (array_key_exists($v, $ret) === false) {
                 return $default;
             }
             $ret = $ret[$v];
@@ -77,9 +78,9 @@ class Composer
 
     public function loadAutoload(string $basepath): array
     {
-        if($this->isLoaded === false) {
-            $vendor = Paths::join($basepath, 'vendor');
-            $dir = Paths::join($vendor, 'composer');
+        if ($this->isLoaded === false) {
+            $vendor = Utils::joinPaths($basepath, 'vendor');
+            $dir = Utils::joinPaths($vendor, 'composer');
 
             if (file_exists($file = $dir . '/autoload_namespaces.php')) {
                 $map = require $file;
@@ -107,7 +108,7 @@ class Composer
                 $includeFiles = require $file;
                 foreach ($includeFiles as $includeFile) {
                     $relativeFile = $this->stripVendorDir($includeFile, $vendor);
-                    Utils::include($includeFile);
+                    //Utils::includeFile($includeFile);
                     $this->files[$relativeFile] = $includeFile;
                 }
             }
@@ -131,7 +132,7 @@ class Composer
         $vendorDir = realpath($vendorDir);
 
         if (strpos($path, $vendorDir) === 0) {
-            $path = substr($path, strlen($vendorDir));
+            $path = substr($path, strlen($vendorDir) + 1);
         }
 
         return $path;

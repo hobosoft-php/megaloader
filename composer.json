@@ -14,23 +14,23 @@
     "require": {
         "psr/log": "^3.0@dev",
         "psr/simple-cache": "^3.0@dev",
-        "hobosoft/boot": "*",
         "hobosoft/config": "*",
         "hobosoft/fileloaders": "*",
         "hobosoft/finders": "*",
         "symfony/yaml": "7.2.x-dev",
         "ext-apcu": "*",
-        "filp/whoops": "^2.15"
+        "spatie/ignition": "^1.15"
     },
     "require-dev": {
-        "laminas/laminas-loader": "2.11.x-dev",
-        "phpunit/php-code-coverage": "*",
-        "smeghead/php-class-diagram": "*",
-        "tracy/tracy": "*"
+        "nunomaduro/patrol": "dev-master",
+        "phpat/phpat": "dev-master",
+        "phpstan/extension-installer": "1.4.x-dev",
+        "pdepend/pdepend": "2.16.2"
     },
     "config": {
         "allow-plugins": {
-            "pestphp/pest-plugin": true
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
         }
     }
 }

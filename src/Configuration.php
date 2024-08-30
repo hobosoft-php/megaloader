@@ -9,9 +9,6 @@ use Hobosoft\Config\Schema\Define;
 use Hobosoft\Config\Schema\Exceptions\ValidationException;
 use Hobosoft\Config\Schema\Processor;
 use Hobosoft\Config\Schema\Types\Structure;
-use Hobosoft\MegaLoader\Locators\MapLocator;
-use Hobosoft\MegaLoader\Locators\Psr0Locator;
-use Hobosoft\MegaLoader\Locators\Psr4Locator;
 use stdClass;
 
 class Configuration //implements ConfigurationInterface
@@ -21,7 +18,7 @@ class Configuration //implements ConfigurationInterface
 
     public static function getSchema(): Structure
     {
-        if(isset(self::$schema) === false) {
+        if (isset(self::$schema) === false) {
             $transformCacheEnabled = function ($value, Context $context) {
                 return match (true) {
                     is_numeric($value) => $value > 0,
@@ -32,16 +29,35 @@ class Configuration //implements ConfigurationInterface
             };
             self::$schema = Define::structure([
                 'prepend' => Define::bool('true'),
+                'replaceComposer' => Define::bool('true'),
                 'cache' => Define::structure([
                     'enabled' => Define::anyOf('true', 'false', true, false, 1, 0)->castTo('bool')->default(false)->transform($transformCacheEnabled),
                     'backend' => Define::string('FileCache'),
-                    'path' => Define::string(Paths::join(PathEnum::CACHE, self::CACHE_FOLDER_NAME)),
+                    'path' => Define::string(Utils::joinPaths(Utils::getDefinedPath('cache'), self::CACHE_FOLDER_NAME)),
                 ])->castTo('array'),
                 'psr-0' => Define::arrayOf('string', 'string'),
                 'psr-4' => Define::arrayOf('string', 'string'),
                 'files' => Define::listOf('string')->description('Source files/directories to be included when autoloader loads.'),
                 'classmap' => Define::listOf('string')->description('Source files/directories to be scanned to make the class map.'),
                 'exclude-from-classmap' => Define::listOf('string')->description('Source files/directories to be excluded from the class map.'),
+                'locators' => Define::structure([
+                    'class' => Define::arrayOf('string', 'string'),
+                    'plugin' => Define::arrayOf('string', 'string'),
+                    'module' => Define::arrayOf('string', 'string'),
+                    'config' => Define::arrayOf('string', 'string'),
+                ])->castTo('array'),
+                'loaders' => Define::structure([
+                    'class' => Define::string(),
+                    'plugin' => Define::string(),
+                    'module' => Define::string(),
+                    'config' => Define::string(),
+                ])->castTo('array'),
+                'decorators' => Define::structure([
+                    'class' => Define::arrayOf('string', 'string'),
+                    'plugin' => Define::arrayOf('string', 'string'),
+                    'module' => Define::arrayOf('string', 'string'),
+                    'config' => Define::arrayOf('string', 'string'),
+                ])->castTo('array'),
             ])->castTo('array');
         }
         return self::$schema;
@@ -58,15 +74,15 @@ class Configuration //implements ConfigurationInterface
         try {
             $normalized = (new Processor())->process(self::getSchema(), $config);
         } catch (ValidationException $e) {
-            echo 'Data is invalid: ' . $e->getMessage();
+            echo __CLASS__.': Data is invalid: ' . $e->getMessage();
         }
         return is_array($normalized) ? $normalized : self::stdToArray($normalized);
     }
 
     private static function stdToArray(stdClass $std): array
     {
-        foreach(($ret = (array)$std) as &$item) {
-            if(is_object($item)) {
+        foreach (($ret = (array)$std) as &$item) {
+            if (is_object($item)) {
                 $item = self::stdToArray($item);
             }
         }
@@ -74,65 +90,3 @@ class Configuration //implements ConfigurationInterface
     }
 }
 
-
-
-    /*public function getConfigTreeBuilder(): TreeBuilder
-    {
-        ($treeBuilder = new TreeBuilder('classloader'))->getRootNode()
-            ->children()
-                ->scalarNode('root_path')->end()
-                ->scalarNode('max_depth')->end()
-                ->scalarNode('cache_path')->end()
-                ->booleanNode('cache_enabled')->end()
-                ->arrayNode('binary_includes')
-                    //->scalarPrototype()->end()
-                ->end()
-                ->arrayNode('includes')
-                    //->scalarPrototype()->end()
-                ->end()
-                ->arrayNode('excludes')
-                    //->scalarPrototype()->end()
-                ->end()
-                ->arrayNode('map')
-                    // ->scalarPrototype()->end()
-                ->end()
-            ;
-
-        return $treeBuilder;
-   }
-
-    'autoloader' => [
-        'rootPath' => ROOTPATH,
-        'maxDepth' => 10,
-        'cachePath' => ROOTPATH . '/var/cache/autoloader',
-        'cacheEnabled' => true,
-        'scannerClass' => 'Library\\Autoloader\\Scanners\\PhpScanner',
-        'loaderClass' => 'Library\\Autoloader\\Loaders\\ClassMapLoader',
-        'addDefaultLoader' => true,
-        'excludePaths' => array(
-            ROOTPATH . '/assets',
-            ROOTPATH . '/bin',
-            ROOTPATH . '/config',
-            ROOTPATH . '/migrations',
-            ROOTPATH . '/public',
-            ROOTPATH . '/templates',
-            ROOTPATH . '/tests',
-            ROOTPATH . '/translations',
-            ROOTPATH . '/var',
-            ROOTPATH . '/vendor',
-        ),
-        'includePaths' => array(
-            ROOTPATH . '/app',
-            ROOTPATH . '/lib',
-            ROOTPATH . '/modules',
-            ROOTPATH . '/modules-test',
-            ROOTPATH . '/plugins',
-        ),
-        'replaceStrings' => array(
-            ['Symfony\\Bundle\\', 'bundles/framework-bundle/'],
-            ['Application', 'app'],
-            ['Plugins', 'plugins'],
-            ['Library', 'lib'],
-            ['Source', 'src'],
-        ),
- */

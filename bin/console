@@ -3,7 +3,7 @@
 
 namespace Hobosoft\MegaLoader\Bin;
 
-define('ROOTPATH', dirname(__DIR__, 1));
+define('ROOTPATH', dirname(__FILE__, 2));
 chdir(ROOTPATH);
 require ROOTPATH.'/vendor/autoload.php';
 require ROOTPATH.'/bootstrap.php';

@@ -3,20 +3,21 @@
 namespace Hobosoft\MegaLoader\Loaders;
 
 use Hobosoft\Boot\Paths;
-use Hobosoft\FileLoaders\Loader\FileLocator;
 use Hobosoft\FileLoaders\Loaders;
+use Hobosoft\MegaLoader\Contracts\LoaderInterface;
+use Hobosoft\MegaLoader\Utils;
 
-class PluginLoader extends AbstractLoader
+class PluginLoader implements LoaderInterface
 {
     const string TYPE = 'plugin';
 
     public function locate(string $name): string|bool
     {
-        foreach($this->config['megaloader.plugins'] as $namespace => $path) {
-            if(str_starts_with($name, $namespace)) {
-                $fn = Paths::join($path, substr($name, strlen($namespace)), 'manifest.yaml');
+        foreach ($this->parent->getConfig()['megaloader.plugins'] as $namespace => $path) {
+            if (str_starts_with($name, $namespace)) {
+                $fn = Utils::joinPaths($path, substr($name, strlen($namespace)), 'manifest.yaml');
                 $manifest = Loaders::load($fn, pathinfo($fn, PATHINFO_EXTENSION));
-                if(class_exists(($cls = $manifest['manifest']['package']['class']), true) === false) {
+                if (class_exists(($cls = $manifest['manifest']['package']['class']), true) === false) {
                     throw new \Exception("Problems loading plugin root class '$cls'");
                 }
                 print_r($manifest);

@@ -18,7 +18,7 @@ class ComposerJson
         private string $filename,
     )
     {
-        $this->items = self::load($filename);
+        $this->items = self::load($this->filename);
         $this->modified = false;
     }
 
@@ -31,9 +31,9 @@ class ComposerJson
     {
         $keys = explode('.', $key);
         $ret = $this->items;
-        foreach($keys as $k => $v) {
+        foreach ($keys as $k => $v) {
             unset($keys[$k]);
-            if(array_key_exists($v, $ret) === false) {
+            if (array_key_exists($v, $ret) === false) {
                 return $default;
             }
             $ret = $ret[$v];
@@ -44,7 +44,7 @@ class ComposerJson
     private function finish($value, $cap)
     {
         $quoted = preg_quote($cap, '/');
-        return preg_replace('/(?:'.$quoted.')+$/u', '', $value).$cap;
+        return preg_replace('/(?:' . $quoted . ')+$/u', '', $value) . $cap;
     }
 
     private function normalizePaths($value, $path)
@@ -53,10 +53,10 @@ class ComposerJson
         foreach ($value as $namespace => $_path) {
             if (is_array($_path)) {
                 foreach ($_path as $i => $p) {
-                    $value[$namespace][$i] = str_replace('//', '/', $path.$this->finish($p, '/'));
+                    $value[$namespace][$i] = str_replace('//', '/', $path . $this->finish($p, '/'));
                 }
             } else {
-                $value[$namespace] = str_replace('//', '/', $path.$this->finish($_path, '/'));
+                $value[$namespace] = str_replace('//', '/', $path . $this->finish($_path, '/'));
             }
         }
 
@@ -65,6 +65,6 @@ class ComposerJson
 
     public function isModified(): bool
     {
-        return($this->modified);
+        return ($this->modified);
     }
 }

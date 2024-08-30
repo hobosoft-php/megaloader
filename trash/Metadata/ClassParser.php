@@ -1,63 +1,23 @@
 <?php
 
-namespace Hobosoft\MegaLoader\Locators;
+namespace Hobosoft\MegaLoader\Metadata;
 
-use Hobosoft\MegaLoader\Contracts\LocatorInterface;
-use Hobosoft\MegaLoader\MegaLoader;
-use Hobosoft\MegaLoader\Traits\LocatorTraits;
-use Hobosoft\MegaLoader\Utils;
+use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 
-class MapLocator implements LocatorInterface
+class ClassParser
 {
-    use LocatorTraits;
-
-    private string $cacheFile;
-    private array $map;
-
-    public function locate(string $name): string|bool
+    public function __construct(
+        protected ?LoggerInterface $logger,
+        protected ?CacheInterface  $cache,
+    )
     {
-        return false;
-        //die("Class ".__CLASS__." is not functional yet.");
+
     }
 
-    private function generateClassMap(array $config): array
+    public function getInfo(string $filename): array
     {
-        $ret = [];
-        foreach ($config['classmap'] as $path) {
-            if (Utils::isPathAbsolute($path) === false) {
-                $path = Utils::joinPaths(MegaLoader::getRootPath(), $path);
-            }
-            if (is_dir($path) === true) {
-                $ret = $ret + $this->scanPath($path);
-            } else if (is_file($path) === true) {
-                $content = file_get_contents($path);
-                $info = $this->parse($content);
-                $ns = ($info['namespace'] ?? '') . '\\';
-                foreach ($info['objects'] as $name) {
-                    $ret[$ns . $name] = "'$path',";
-                }
-            }
-        }
-        return $ret;
-    }
-
-    private function scanPath(string $path, int $depth = 0): array
-    {
-        if ($depth >= 20) {
-            throw new \Exception("scanPath depth exceeded 20!");
-        }
-        $ret = [];
-        $files = scandir($path);
-        foreach ($files as $file) {
-            if ($file === '.' || $file === '..') {
-                continue;
-            }
-            if (is_dir(($fn = Utils::joinPaths($path, $file)))) {
-                $ret += $this->scanPath($fn, $depth + 1);
-            } else if (is_file($fn) && pathinfo($file, PATHINFO_EXTENSION) === 'php') {
-                $ret[] = $fn;
-            }
-        }
+        $ret = $this->parse(file_get_contents($filename));
         return $ret;
     }
 

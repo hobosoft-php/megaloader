@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phive xmlns="https://phar.io/phive">
+  <phar name="dephpend" version="^0.8.0" installed="0.8.0" location="./tools/dephpend" copy="false"/>
+</phive>

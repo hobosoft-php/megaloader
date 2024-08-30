@@ -2,8 +2,15 @@
 
 namespace Hobosoft\MegaLoader\Locators;
 
-class Psr0Locator extends AbstractLocator
+use Hobosoft\MegaLoader\Contracts\LocatorInterface;
+use Hobosoft\MegaLoader\MegaLoader;
+use Hobosoft\MegaLoader\Traits\LocatorTraits;
+use Hobosoft\MegaLoader\Utils;
+
+class Psr0Locator implements LocatorInterface
 {
+    use LocatorTraits;
+
     protected function makeFilename(string $path, array $className): string
     {
         return $path . implode('/', $className) . '.php';
@@ -13,13 +20,13 @@ class Psr0Locator extends AbstractLocator
     {
         $fn = strtr($name, '\\/', '/');
         $sfn = lcfirst($fn);
-        if(file_exists(($sfn = ROOTPATH . DIRECTORY_SEPARATOR . $sfn . '.php'))) {
+        if (file_exists(($sfn = MegaLoader::getRootPath() . DIRECTORY_SEPARATOR . $sfn . '.php'))) {
             return $sfn;
         }
-        foreach(($this->config[$this->configSection.'.psr-0'] ?? []) as $k => $v) {
+        foreach (($this->config['psr-0'] ?? []) as $k => $v) {
             $k = strtr($k, '\\/', '/');
-            if(str_starts_with($fn, $k)) {
-                if(file_exists(($sfn = ROOTPATH . DIRECTORY_SEPARATOR . $v . substr($fn, strlen($k)) . '.php'))) {
+            if (str_starts_with($fn, $k)) {
+                if (file_exists(($sfn = MegaLoader::getRootPath() . DIRECTORY_SEPARATOR . $v . substr($fn, strlen($k)) . '.php'))) {
                     return $sfn;
                 }
             }
