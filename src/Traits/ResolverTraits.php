@@ -34,7 +34,7 @@ trait ResolverTraits
             $this->addType($type);
         }
         class_exists($loader, true);
-        $this->children[$type->value][$loader] = static fn($p, $q) => new ($loader)($p, $q);
+        $this->children[$type->value][$loader] = static fn($p, $q, $k) => new ($loader)($p, $q, $k);
         return $this;
     }
 
@@ -66,10 +66,10 @@ trait ResolverTraits
             if($child instanceof Closure) {
                 $impl = class_implements($this);
                 if(isset($impl[LocatorInterface::class])) {
-                    $child = ($child)($this->config, $this);
+                    $child = ($child)($this->config, $this->logger, $this);
                 }
                 else {
-                    $child = ($child)($this->config, $this->locatorResolver);
+                    $child = ($child)($this->config, $this->logger, $this->locatorResolver);
                 }
                 $this->children[$type->value][$k] = $child;
             }
@@ -97,10 +97,10 @@ trait ResolverTraits
         }
     }
 
-    public function setConfig(MiniConfig $config): void
-    {
-        $this->config = $config;
-    }
+//    public function setConfig(MiniConfig $config): void
+//    {
+//        $this->config = $config;
+//    }
 
     public function getConfig(): MiniConfig
     {

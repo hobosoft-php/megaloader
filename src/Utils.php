@@ -7,6 +7,7 @@ class Utils
     protected static array $includedFiles = [];
     protected static array $includedErrors = [];
 
+    protected static mixed $config;
     protected static bool $registered = false;
 
     public static function joinPaths(string ...$paths): string
@@ -29,11 +30,12 @@ class Utils
 
     public static function includeFile(string $fn, int $flags = 0): bool
     {
+        $fn = str_replace('\\\\', '\\', $fn);
         if (self::$registered === false) {
             self::$registered = true;
-            $logfn = self::joinPaths(MegaLoader::getRootPath(), 'var/debug/included_files-'.PHP_SAPI.'-megaloader.txt');
-            if (is_dir(($dir = dirname($fn))) === false) {
-                mkdir($dir, 0777, true);
+            $logfn = self::joinPaths(ROOTPATH, 'var/debug-'.PHP_SAPI.'/included_files-megaloader.txt');
+            if (is_dir(($dir = dirname($logfn))) === false) {
+                mkdir($dir, 0777, true) or die("Failed to create directory $dir.");
             }
             register_shutdown_function(function () use ($logfn) {
                 $content = '';
@@ -45,17 +47,15 @@ class Utils
             });
         }
         if (array_key_exists($fn, self::$includedFiles)) {
-            //throw new \Exception("File '$fn' is already included by MegaLoader.");
-            self::$includedErrors[$fn] = ['error' => true, 'message' => "File is already included by MegaLoader.\n\n" . self::formatBacktrace(debug_backtrace())];
-            return false;
+            self::$includedErrors[$fn] = ['error' => true, 'message' => "File is already included by MegaLoader.\n\n"];
+            throw new \Exception("File '$fn' is already included by MegaLoader.");
         } else if (in_array($fn, get_included_files())) {
-            //throw new \Exception("File '$fn' is already included by something else.");
-            self::$includedErrors[$fn] = ['error' => true, 'message' => "File is already included by something else.\n\n" . self::formatBacktrace(debug_backtrace())];
-            return false;
+            self::$includedErrors[$fn] = ['error' => true, 'message' => "File is already included by something else.\n\n"];
+            throw new \Exception("File '$fn' is already included by something else.");
         }
         else if (file_exists(($fn)) === false) {
-            self::$includedErrors[$fn] = ['error' => true, 'message' => "Include file '$fn' not found, please check autoloader configuration.\n\n" . self::formatBacktrace(debug_backtrace())];
-            throw new \Exception("Include file '$fn' not found, please check autoloader configuration.\n\n" . self::formatBacktrace(debug_backtrace()));
+            self::$includedErrors[$fn] = ['error' => true, 'message' => "Include file '$fn' not found, please check autoloader configuration.\n"];
+            throw new \Exception("Include file '$fn' not found, please check autoloader configuration.");
         }
         self::$includedFiles[$fn] = ['error' => false, 'message' => 'success'];
         (function (string $fn): void {
@@ -73,12 +73,23 @@ class Utils
         return array_reduce($needles, fn($a, $n) => $a || str_contains($haystack, $n), false);
     }
 
+    private static function filesOnly(array &$list): array
+    {
+        foreach($list as $k => $file) {
+            if(is_file($file) &&  file_exists($file)) {
+                continue;
+            }
+            unset($list[$k]);
+        }
+        return $list;
+    }
+
     public static function includeArray(array $fileList, string $basePath = null, int $flags = 0): bool
     {
+        $errors = [];
         while(!empty($fileList)) {
             $fileName = array_shift($fileList);
             if(is_array($fileName) === true) {
-                print("added array\n");
                 $fileList += $fileName;
                 continue;
             }
@@ -86,8 +97,20 @@ class Utils
                 $fileName = self::joinPaths($basePath, $fileName);
             }
             if($flags & self::ALLOW_GLOB && self::str_contains_any($fileName, ['*', '?', '[', ']'])) {
-                $fileList = array_merge($fileList, ($r = glob($fileName)));
+                $r = glob($fileName);
+                $fileList = array_merge($fileList, self::filesOnly($r));
             }
+            else {
+                try {
+                    self::includeFile($fileName, $flags);
+                }
+                catch (\Exception $e) {
+                    $errors[] = $e->getMessage();
+                }
+            }
+        }
+        if(count($errors) > 0) {
+            throw new \Exception("Error including files:  \n   ".implode("\n   ", $errors));
         }
         return true;
     }
@@ -95,7 +118,7 @@ class Utils
     public static function includePath(string $path): bool
     {
         if(str_starts_with($path, '/') === false) {
-            $path = self::joinPaths(MegaLoader::getRootPath(), $path);
+            $path = self::joinPaths(ROOTPATH, $path);
         }
         if(is_dir($path = rtrim($path, '\\/')) === false) {
             return false;
@@ -107,7 +130,7 @@ class Utils
     public static function fullPathGlob(string $filter, string $basePath = null): array
     {
         if (self::isPathRelative($filter)) {
-            $basePath = is_null($basePath) ? MegaLoader::getRootPath() : $basePath;
+            $basePath = is_null($basePath) ? ROOTPATH : $basePath;
             $filter = self::joinPaths($basePath, $filter);
         }
         $ret = [];
@@ -175,7 +198,17 @@ class Utils
 
     public static function getRootPath(): string
     {
-        return dirname(__DIR__);
+        if(defined('ROOTPATH')) {
+            return ROOTPATH;
+        }
+        $ret = dirname($_SERVER['PHP_SELF']);
+        if(file_exists($ret . '/composer.json') === false) {
+            $ret = dirname($ret);
+            if(file_exists($ret . '/composer.json') === false) {
+                throw new \Exception("Not able to determine root path, composer.json not found");
+            }
+        }
+        return $ret;
     }
 
     private static array $paths;

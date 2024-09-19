@@ -93,7 +93,7 @@ class LoaderDelegator extends AbstractLoader
         print(__METHOD__ . ": Loading class '$name' of type '$type'...\n");
         $ret = $this->loaders[$type]->load($name, $type);
         if($ret === false) {
-            print("Failed to load class $name.\n");
+            print("LoaderDelegator Failed to load class $name.\n");
         }
         //print((($ret === false) ? 'failed' : 'success: '.$ret)."\n");
         return $ret;

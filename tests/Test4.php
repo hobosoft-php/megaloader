@@ -1,6 +1,5 @@
 <?php
 
-use Hobosoft\Logger\Logger;
 use Hobosoft\Config\Config;
 use Hobosoft\Finders\FileFinder;
 use Hobosoft\MegaLoader\MegaLoader;
@@ -13,11 +12,10 @@ $config = new Config(null, null, [ 'megaloader' => $loader->getConfig() ]);
 $logger = new Logger($config);
 $loader->dump();
 
-
 if(PHP_SAPI === 'cli') {
     require_once __DIR__.'/../vendor/autoload.php';
     \Spatie\Ignition\Ignition::make()
-        ->applicationPath(\Hobosoft\MegaLoader\MegaLoader::getRootPath())
+        ->applicationPath(\Hobosoft\MegaLoader\ROOTPATH)
         ->register();
 }
 else {

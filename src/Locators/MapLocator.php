@@ -25,7 +25,7 @@ class MapLocator implements LocatorInterface
         $ret = [];
         foreach ($config['classmap'] as $path) {
             if (Utils::isPathAbsolute($path) === false) {
-                $path = Utils::joinPaths(MegaLoader::getRootPath(), $path);
+                $path = Utils::joinPaths(ROOTPATH, $path);
             }
             if (is_dir($path) === true) {
                 $ret = $ret + $this->scanPath($path);
@@ -99,7 +99,7 @@ class MapLocator implements LocatorInterface
                 if (isset($tokens[$i]) && isset($tokens[$i][1])) {
                     $ns .= $tokens[$i][1];
                 } else {
-                    print_r($tokens[$i]);
+                    //print_r($tokens[$i]);
                 }
             }
             $ns = trim($ns);

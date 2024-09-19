@@ -2,7 +2,6 @@
 
 namespace Hobosoft\MegaLoader\Loaders;
 
-use Hobosoft\Boot\Paths;
 use Hobosoft\FileLoaders\Loaders;
 use Hobosoft\MegaLoader\Contracts\LoaderInterface;
 use Hobosoft\MegaLoader\Utils;
@@ -28,7 +27,7 @@ class PluginLoader implements LoaderInterface
 
     public function load(string $name): bool
     {
-        // TODO: Implement load() method.
+
         return false;
     }
 }

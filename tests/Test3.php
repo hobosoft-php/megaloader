@@ -2,14 +2,13 @@
 
 use Hobosoft\Config\Config;
 use Hobosoft\Finders\FileFinder;
-use Hobosoft\Logger\Logger;
 use Hobosoft\MegaLoader\MegaLoader;
 use Hobosoft\MegaLoader\MiniLoader;
+use Hobosoft\MegaLoader\MiniLogger;
 
 define('ROOTPATH', dirname(__DIR__));
 
-require_once __DIR__.'/../vendor/autoload.php';
-require_once __DIR__.'/../src/bootstrap.php';
+//require_once __DIR__.'/../vendor/autoload.php';
 
 $loaderConfig = [
     'cache' => [
@@ -24,11 +23,12 @@ $loaderConfig = [
     ],
 ];
 
-$loader = new MiniLoader($loaderConfig['psr-4']);
+$loader = require_once __DIR__.'/../bootstrap.php';
+$logger = new MiniLogger();
+//$loader = new MiniLoader($logger, $loaderConfig['psr-4']);
 $config = new Config(null, null, [ 'megaloader' => $loaderConfig ]);
-$logger = new Logger($config);
 
-$loader = $loader->createMegaLoader($logger, $config);
+$loader = $loader->createMegaLoader();
 
 $finder = new FileFinder();
 

@@ -2,33 +2,35 @@
 
 namespace Hobosoft\MegaLoader;
 
-class MiniConfig implements \ArrayAccess
+use Hobosoft\Config\Utils;
+
+class MiniConfig extends MiniDecorator implements \ArrayAccess
 {
+    const string CLASSNAME = __CLASS__;
+
     public function __construct(
         protected array $config = [],
     )
     {
     }
 
-    public function has(string $name): bool
+    public function setConfig(mixed $config): void
     {
-        return isset($this->config[$name]);
-    }
-
-    public function get(string $name = null): array|false
-    {
-        return is_null($name) ? $this->config : $this->config[$name] ?? false;
-    }
-
-    public function set(mixed $name, mixed $data = null): void
-    {
-        if(is_null($data)) {
-            $this->config = $name;
-            return;
+        if(is_array($config)) {
+            $this->config = $config;
         }
-        $this->config[$name] = $data;
+        else {
+            $this->setDecoratedObject($config);
+            //$config->merge($this->config);
+        }
     }
 
+    public function toArray(): array
+    {
+        return $this->config;
+    }
+
+    /*
     private function mergeLevel(array &$dest, array $source, bool $replaceExisting = false): void
     {
         $todo = [];
@@ -66,6 +68,26 @@ class MiniConfig implements \ArrayAccess
             }
         }
     }
+    */
+
+    public function has(string $name): bool
+    {
+        return isset($this->config[$name]);
+    }
+
+    public function get(string $name = null): array|false
+    {
+        return is_null($name) ? $this->config : $this->config[$name] ?? false;
+    }
+
+    public function set(mixed $name, mixed $data = null): void
+    {
+        if(is_null($data)) {
+            $this->config = $name;
+            return;
+        }
+        $this->config[$name] = $data;
+    }
 
     public function offsetExists(mixed $offset): bool
     {
@@ -85,5 +107,10 @@ class MiniConfig implements \ArrayAccess
     public function offsetUnset(mixed $offset): void
     {
         unset($this->config[$offset]);
+    }
+
+    public function merge(array $cfg)
+    {
+        $this->config = array_merge($this->config, $cfg);
     }
 }

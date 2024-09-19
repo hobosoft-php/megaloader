@@ -20,13 +20,13 @@ class Psr0Locator implements LocatorInterface
     {
         $fn = strtr($name, '\\/', '/');
         $sfn = lcfirst($fn);
-        if (file_exists(($sfn = MegaLoader::getRootPath() . DIRECTORY_SEPARATOR . $sfn . '.php'))) {
+        if (file_exists(($sfn = ROOTPATH . DIRECTORY_SEPARATOR . $sfn . '.php'))) {
             return $sfn;
         }
         foreach (($this->config['psr-0'] ?? []) as $k => $v) {
             $k = strtr($k, '\\/', '/');
             if (str_starts_with($fn, $k)) {
-                if (file_exists(($sfn = MegaLoader::getRootPath() . DIRECTORY_SEPARATOR . $v . substr($fn, strlen($k)) . '.php'))) {
+                if (file_exists(($sfn = ROOTPATH . DIRECTORY_SEPARATOR . $v . substr($fn, strlen($k)) . '.php'))) {
                     return $sfn;
                 }
             }

@@ -8,8 +8,6 @@ use Hobosoft\MegaLoader\Locators\MapLocator;
 use Hobosoft\MegaLoader\Locators\PluginLocator;
 use Hobosoft\MegaLoader\Locators\Psr0Locator;
 use Hobosoft\MegaLoader\Locators\Psr4Locator;
-use Hobosoft\MegaLoader\ResolvingLoader;
-use Hobosoft\MegaLoader\ResolvingLocator;
 
 return [
 

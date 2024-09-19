@@ -29,7 +29,7 @@ class Composer
     {
         $this->logger ??= new NullLogger();
         $this->composerFiles = [
-            Utils::joinPaths(MegaLoader::getRootPath(), 'composer.json') => static fn($fn) => new ComposerJson($fn),
+            Utils::joinPaths(ROOTPATH, 'composer.json') => static fn($fn) => new ComposerJson($fn),
         ];
     }
 

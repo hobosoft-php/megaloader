@@ -6,7 +6,7 @@ use Hobosoft\MegaLoader\Contracts\LocatorInterface;
 
 class PluginLocator implements LocatorInterface
 {
-    public function locate(string $pluginName): string|bool
+    public function locate(string $name): string|bool
     {
         return false;
     }

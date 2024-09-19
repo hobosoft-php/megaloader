@@ -18,7 +18,7 @@ class Psr4Locator implements LocatorInterface
             $tail = substr(strtr($className, '\\/', DIRECTORY_SEPARATOR), strlen($search)) . '.php';
             while (!empty($replace)) {
                 $entry = array_shift($replace);
-                $root = ($entry[0] === '/') ? $entry : Utils::joinPaths(MegaLoader::getRootPath(), $entry);
+                $root = ($entry[0] === '/') ? $entry : Utils::joinPaths(ROOTPATH, $entry);
                 if (file_exists(($fn = Utils::joinPaths($root, $tail)))) {
                     return $fn;
                 }
@@ -30,7 +30,13 @@ class Psr4Locator implements LocatorInterface
     public function locate(string $name): string|bool
     {
         foreach (($this->config['psr-4'] ?? []) as $k => $v) {
-            if (($filename = $this->makeFilename(MegaLoader::getRootPath(), $name, $k, $v)) !== false) {
+            if (($filename = $this->makeFilename(ROOTPATH, $name, $k, $v)) !== false) {
+                return $filename;
+            }
+        }
+        foreach (MegaLoader::$pluginPsr4 as $k => $v) {
+            print("plugin psr4: '$k' = '$v'\n");
+            if (($filename = $this->makeFilename(ROOTPATH, $name, $k, $v)) !== false) {
                 return $filename;
             }
         }

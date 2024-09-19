@@ -18,6 +18,7 @@ class ClassLoader implements LoaderInterface
 
     public function load(string $name): bool
     {
+        //print("ClassLoader loading file: $name\n");
         return ($located = $this->locatorResolver->locate($name, Type::T_CLASS)) && Utils::includeFile($located);
     }
 }
