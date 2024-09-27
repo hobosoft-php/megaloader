@@ -12,11 +12,8 @@
         }
     },
     "require": {
-        "psr/log": "^3.0@dev",
+        "psr/log": "3.x-dev",
         "psr/simple-cache": "^3.0@dev",
-        "hobosoft/finders": "*",
-        "hobosoft/config": "*",
-        "hobosoft/fileloaders": "*",
         "symfony/yaml": "7.2.x-dev",
         "ext-apcu": "*"
     },
