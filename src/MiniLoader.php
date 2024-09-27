@@ -21,6 +21,9 @@ class MiniLoader implements LoaderInterface
     public static function create(string $rootPath = null, array $config = [], bool $prepend = false): mixed
     {
         if(isset(self::$instance)) {
+            if(class_exists(\Hobosoft\MegaLoader\MegaLoader::class)) {
+                return \Hobosoft\MegaLoader\MegaLoader::create(self::$instance);
+            }
             return self::$instance;
         }
         return (self::$instance = new self($rootPath ?? ROOTPATH, $config, $prepend));

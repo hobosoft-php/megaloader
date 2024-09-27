@@ -28,13 +28,19 @@ trait ResolverTraits
         return isset($this->children[$type->value]);
     }
 
-    public function add(Type $type, string $loader): mixed
+    public function add(Type $type, string $className, Closure $closure = null): mixed
     {
+        print("adding type '{$type->name}' to ".get_called_class()."...$className.\n");
         if($this->hasType($type) === false) {
             $this->addType($type);
         }
-        class_exists($loader, true);
-        $this->children[$type->value][$loader] = static fn($p, $q, $k) => new ($loader)($p, $q, $k);
+        if(is_null($closure)) {
+            class_exists($className, true);
+            $this->children[$type->value][$className] = static fn($p, $q, $k) => new ($className)($p, $q, $k);
+        }
+        else {
+            $this->children[$type->value][$className] = $closure;
+        }
         return $this;
     }
 

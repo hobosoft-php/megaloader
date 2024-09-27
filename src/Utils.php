@@ -28,6 +28,15 @@ class Utils
         return $ret;
     }
 
+    public static function wildcardReplace(string $pattern, string $subject): string
+    {
+        $pattern = strtr($pattern, array(
+            '*' => '.*?', // 0 or more (lazy) - asterisk (*)
+            '?' => '.', // 1 character - question mark (?)
+        ));
+        return preg_match("/$pattern/", $subject);
+    }
+
     public static function includeFile(string $fn, int $flags = 0): bool
     {
         $fn = str_replace('\\\\', '\\', $fn);
@@ -35,7 +44,7 @@ class Utils
             self::$registered = true;
             $logfn = self::joinPaths(ROOTPATH, 'var/debug-'.PHP_SAPI.'/included_files-megaloader.txt');
             if (is_dir(($dir = dirname($logfn))) === false) {
-                mkdir($dir, 0777, true) or die("Failed to create directory $dir.");
+                @mkdir($dir, 0777, true) or die("Failed to create directory $dir.");
             }
             register_shutdown_function(function () use ($logfn) {
                 $content = '';
@@ -105,6 +114,7 @@ class Utils
                     self::includeFile($fileName, $flags);
                 }
                 catch (\Exception $e) {
+                    print("Error including $fileName.\n");
                     $errors[] = $e->getMessage();
                 }
             }

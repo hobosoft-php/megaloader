@@ -19,5 +19,5 @@ abstract class AbstractLocator implements LocatorInterface
         $this->configSection = $section;
     }
 
-    abstract public function locate(string $name): string|bool;
+    abstract public function locate(string $name): array|string|bool;
 }

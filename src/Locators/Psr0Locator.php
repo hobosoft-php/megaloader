@@ -16,7 +16,7 @@ class Psr0Locator implements LocatorInterface
         return $path . implode('/', $className) . '.php';
     }
 
-    public function locate(string $name): string|bool
+    public function locate(string $name): array|string|bool
     {
         $fn = strtr($name, '\\/', '/');
         $sfn = lcfirst($fn);

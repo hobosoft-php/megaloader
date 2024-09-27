@@ -27,7 +27,7 @@ class Psr4Locator implements LocatorInterface
         return false;
     }
 
-    public function locate(string $name): string|bool
+    public function locate(string $name): array|string|bool
     {
         foreach (($this->config['psr-4'] ?? []) as $k => $v) {
             if (($filename = $this->makeFilename(ROOTPATH, $name, $k, $v)) !== false) {

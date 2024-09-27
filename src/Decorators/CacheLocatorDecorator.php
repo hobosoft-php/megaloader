@@ -47,7 +47,7 @@ class CacheLocatorDecorator implements LocatorInterface
         }
     }
 
-    public function locate(string $name): string|bool
+    public function locate(string $name): array|string|bool
     {
         if (array_key_exists($name, $this->classMap)) {
             print(__METHOD__ . ":  Found classMap entry for '$name'.\n");

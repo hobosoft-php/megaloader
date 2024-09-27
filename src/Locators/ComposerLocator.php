@@ -17,7 +17,7 @@ class ComposerLocator implements LocatorInterface, ResolverInterface
     private Composer $composer;
     private array $autoload = [];
 
-    public function locate(string $name): string|bool
+    public function locate(string $name): array|string|bool
     {
         if(isset($this->composer) === false) {
             $this->add(Type::T_CLASS, MapLocator::class);

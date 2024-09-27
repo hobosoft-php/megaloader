@@ -14,7 +14,7 @@ class MapLocator implements LocatorInterface
     private string $cacheFile;
     private array $map;
 
-    public function locate(string $name): string|bool
+    public function locate(string $name): array|string|bool
     {
         return false;
         //die("Class ".__CLASS__." is not functional yet.");

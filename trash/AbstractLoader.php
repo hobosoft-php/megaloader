@@ -49,7 +49,7 @@ abstract class AbstractLoader implements LocatorInterface, LoaderInterface
         $this->locator = $loader;
     }
 
-    public function locate(string $name): string|bool
+    public function locate(string $name): array|string|bool
     {
         return $this->getLocator()->locate($name);
     }

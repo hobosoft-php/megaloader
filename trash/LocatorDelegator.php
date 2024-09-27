@@ -23,7 +23,7 @@ class LocatorDelegator extends AbstractLocator
         }
     }
 
-    public function locate(string $name): string|bool
+    public function locate(string $name): array|string|bool
     {
         foreach ($this->locators as &$locator) {
             if ($locator instanceof \Closure) {

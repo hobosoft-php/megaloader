@@ -10,7 +10,7 @@ class PluginLoader implements LoaderInterface
 {
     const string TYPE = 'plugin';
 
-    public function locate(string $name): string|bool
+    public function locate(string $name): array|string|bool
     {
         foreach ($this->parent->getConfig()['megaloader.plugins'] as $namespace => $path) {
             if (str_starts_with($name, $namespace)) {

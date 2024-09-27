@@ -56,18 +56,24 @@ class MegaLoader //implements LoaderInterface
         //(self::$instance)->config->set($oldcfg);
     }
 
+    /**
+     * @throws \Exception
+     */
     protected function __construct(MiniLoader $miniLoader)
     {
         $this->rootPath = $miniLoader->getRootPath();
+
         Utils::includeArray([
             //'Contracts/*',
-            'Exceptions/*',
+            //'Exceptions/*',
             'Traits/*',
             'Composer/*',
             'Locators/*',
             'Loaders/*',
             'Decorators/*',
         ], __DIR__, Utils::ALLOW_GLOB);
+
+        class_exists(Type::class, true);
 
         $this->logger = $miniLoader->getLogger();
         $this->config = $miniLoader->getConfig();
@@ -79,34 +85,25 @@ class MegaLoader //implements LoaderInterface
 
         $this->locatorResolver = new class($this->config, $this->logger) implements ResolvingLocatorInterface, LocatorInterface {
             use LocatorTraits, ResolverTraits;
-            public function locate(string $name, mixed $type = null): string|bool
-            {
+            public function locate(string $name, mixed $type = null): array|string|bool {
                 return $this->resolve($name, $type);
             }
         };
 
-        $this->loaderResolver = new class($this->config, $this->logger, $this->locatorResolver) implements ResolvingLoaderInterface, LoaderInterface
-        {
+        $this->loaderResolver = new class($this->config, $this->logger, $this->locatorResolver) implements ResolvingLoaderInterface, LoaderInterface {
             use LoaderTraits, ResolverTraits;
         };
 
         foreach(($this->config['locators'] ?? []) as $type => $locators) {
             foreach($locators as $locator) {
-                print("adding locator type '$type'...$locator.\n");
                 $this->locatorResolver->add(Type::fromString($type), $locator);
             }
         }
 
         foreach(($this->config['loaders'] ?? []) as $type => $loader) {
-            print("adding loader type '$type'...$loader.\n");
             $this->loaderResolver->add(Type::fromString($type), $loader);
         }
 
-        foreach(($this->config['decorators'] ?? []) as $type => $decorators) {
-            foreach($decorators as $decorator) {
-                //$this->loaderResolver->add(Type::fromString($type), $loader);
-            }
-        }
         /*
         try {
             $this->config[self::CONFIG_SECTION] = Configuration::process($this->config[self::CONFIG_SECTION] ?? []);
@@ -114,11 +111,11 @@ class MegaLoader //implements LoaderInterface
         catch (\Exception $e) {
             $this->logger->info("exception: ".$e->getMessage()."\n");
         }
-        */
+
         if ((($this->config['cache'] ?? []) ['enabled']) ?? null === true) {
             $this->loaderResolver->decorate(Type::T_CLASS, ClassLoader::class, CacheLocatorDecorator::class);
             $this->logger->info("Cache enabled for megaloader.");
-        }
+        }*/
         spl_autoload_register([$this, 'load'], true, $this->config['prepend'] ?? false);
 
         //make the miniloader destruct
@@ -126,11 +123,6 @@ class MegaLoader //implements LoaderInterface
         $miniLoader = null; unset($miniLoader);
 
         $this->getComposer();
-    }
-
-    public function getRootPath(): string
-    {
-        return $this->rootPath;
     }
 
     public function __destruct()
@@ -162,12 +154,16 @@ class MegaLoader //implements LoaderInterface
     {
         $this->logger->info("megaloader: checking composer...");
         if(isset($this->composer) === false) {
-            $this->logger->info("loading composer from'".$this->getRootPath()."'.");
-            $this->composer = new Composer($this->logger, $this->getRootPath());
-            $cfg = $this->composer->loadAutoload($this->getRootPath());
-            $this->config->merge([ 'megaloader' => $cfg ]);
-            file_put_contents(ROOTPATH.'/var/tmp/included.txt', implode(PHP_EOL, get_included_files()));
-            file_put_contents(ROOTPATH.'/var/tmp/composer_files.txt', implode(PHP_EOL, $cfg['files']));
+            $this->logger->info("loading composer from'".ROOTPATH."'.");
+            $this->composer = new Composer($this->logger, ROOTPATH);
+            $cfg = $this->composer->loadAutoload(ROOTPATH);
+            $this->config->merge($cfg);
+            $dbgPath = ROOTPATH.'/var/debug-'.PHP_SAPI;
+            if(is_dir($dbgPath) === false) {
+                @mkdir($dbgPath, 0777, true);
+            }
+            file_put_contents($dbgPath.'/included.txt', implode(PHP_EOL, get_included_files()));
+            file_put_contents($dbgPath.'/composer_files.txt', implode(PHP_EOL, $cfg['files']));
             try {
                 Utils::includeArray($cfg['files'] ?? []);
             }
@@ -182,23 +178,26 @@ class MegaLoader //implements LoaderInterface
         return $this->composer;
     }
 
-    public function getLoaderResolver(): ResolvingLoaderInterface
+    public function addLocator(string $className, Type $type = Type::T_CLASS, Closure $closure = null): void
     {
-        return $this->loaderResolver;
+        if(is_null($closure) === false) {
+            $this->locatorResolver->add($type, $className, $closure);
+        }
+        $this->locatorResolver->add($type, $className, $closure);
     }
 
-    public function getLocatorResolver(): ResolvingLocatorInterface
+    public function addLoader(string $className, Type $type = Type::T_CLASS, Closure $closure = null): void
     {
-        return $this->locatorResolver;
+        $this->loaderResolver->add($type, $className);
     }
 
-    public function locate(string $name, string $type = 'class'): string|bool
+    public function locate(string $name, Type|string $type = 'class'): array|string|bool
     {
-        //$this->logger->info("megaloader: locating '$name'...");
+        $this->logger->info("megaloader: locating '$name'...");
         return $this->locatorResolver->locate($name, $type);
     }
 
-    public function load(string $name, string $type = 'class'): bool
+    public function load(string $name, Type|string $type = 'class'): bool
     {
         $this->logger->info("megaloader: loading '$name'...");
         return $this->loaderResolver->load($name, $type);
