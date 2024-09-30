@@ -8,8 +8,6 @@ use Hobosoft\MegaLoader\Contracts\LoaderInterface;
 use Hobosoft\MegaLoader\Contracts\LocatorInterface;
 use Hobosoft\MegaLoader\Contracts\ResolvingLoaderInterface;
 use Hobosoft\MegaLoader\Contracts\ResolvingLocatorInterface;
-use Hobosoft\MegaLoader\Decorators\CacheLocatorDecorator;
-use Hobosoft\MegaLoader\Loaders\ClassLoader;
 use Hobosoft\MegaLoader\Traits\LocatorTraits;
 use Hobosoft\MegaLoader\Traits\LoaderTraits;
 use Hobosoft\MegaLoader\Traits\ResolverTraits;
@@ -63,25 +61,28 @@ class MegaLoader //implements LoaderInterface
     {
         $this->rootPath = $miniLoader->getRootPath();
 
-        Utils::includeArray([
-            //'Contracts/*',
-            //'Exceptions/*',
-            'Traits/*',
-            'Composer/*',
-            'Locators/*',
-            'Loaders/*',
-            'Decorators/*',
-        ], __DIR__, Utils::ALLOW_GLOB);
-
-        class_exists(Type::class, true);
+        try {
+            Utils::includeArray([
+                'Contracts/*',
+                'Exceptions/*',
+                'Traits/*',
+                'Composer/*',
+                'Locators/*',
+                'Loaders/*',
+                'Decorators/*',
+                'Type.php',
+            ], __DIR__, Utils::ALLOW_GLOB);
+        } catch(\Exception $e) {
+            print $e->getMessage();
+        }
+        //class_exists(Type::class, true);
 
         $this->logger = $miniLoader->getLogger();
         $this->config = $miniLoader->getConfig();
 
         $configFile = ROOTPATH . '/config/megaloader.php';
         $ld = include($configFile);
-
-        $this->config->set($ld['megaloader']);
+        $this->config->merge($ld);
 
         $this->locatorResolver = new class($this->config, $this->logger) implements ResolvingLocatorInterface, LocatorInterface {
             use LocatorTraits, ResolverTraits;
@@ -157,7 +158,7 @@ class MegaLoader //implements LoaderInterface
             $this->logger->info("loading composer from'".ROOTPATH."'.");
             $this->composer = new Composer($this->logger, ROOTPATH);
             $cfg = $this->composer->loadAutoload(ROOTPATH);
-            $this->config->merge($cfg);
+            $this->config->merge(['megaloader' => $cfg]);
             $dbgPath = ROOTPATH.'/var/debug-'.PHP_SAPI;
             if(is_dir($dbgPath) === false) {
                 @mkdir($dbgPath, 0777, true);

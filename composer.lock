@@ -4,96 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "061c42d10bcec3bfc5e16a1928f2231a",
+    "content-hash": "98eac692253b33ec8da4d26a533bf861",
     "packages": [
-        {
-            "name": "hobosoft/config",
-            "version": "1.0.0",
-            "dist": {
-                "type": "path",
-                "url": "/var/www/projects/unnamed-framework-components/config",
-                "reference": "4f841638f9184744adaaa7c1da956d5edf21fa73"
-            },
-            "require": {
-                "hobosoft/fileloaders": "*",
-                "hobosoft/megaloader": "^1.0",
-                "psr/log": "^3.0@dev"
-            },
-            "require-dev": {
-                "pestphp/pest": "*",
-                "phpunit/php-code-coverage": "^11.0@dev"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Hobosoft\\Config\\": "src/",
-                    "Hobosoft\\Config\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Configuration Equipment",
-            "transport-options": {
-                "relative": false
-            }
-        },
-        {
-            "name": "hobosoft/fileloaders",
-            "version": "1.0.0",
-            "dist": {
-                "type": "path",
-                "url": "/var/www/projects/unnamed-framework-components/fileloaders",
-                "reference": "f496a7137d085f048ab43d17f69b0a8744862821"
-            },
-            "require": {
-                "psr/log": "*",
-                "symfony/yaml": "7.2.x-dev"
-            },
-            "require-dev": {
-                "hobosoft/megaloader": "^1.0",
-                "pestphp/pest": "3.x-dev"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Hobosoft\\FileLoaders\\Tests\\": "tests/",
-                    "Hobosoft\\FileLoaders\\": "src/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Classes to load various types of configuration files.",
-            "transport-options": {
-                "relative": false
-            }
-        },
-        {
-            "name": "hobosoft/finders",
-            "version": "1.0.0",
-            "dist": {
-                "type": "path",
-                "url": "/var/www/projects/unnamed-framework-components/finders",
-                "reference": "07ceb4aa2a3d557df118b7d3b80c8c88aa1c9456"
-            },
-            "require-dev": {
-                "pestphp/pest": "3.x-dev"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Hobosoft\\Finders\\": "src/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Various types of finders.",
-            "transport-options": {
-                "relative": false
-            }
-        },
         {
             "name": "psr/log",
             "version": "dev-master",
@@ -351,12 +263,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "96baa902364319459742cd7bebad7367b73446e9"
+                "reference": "888f0ea2507fcc332a51fe9d2dcba7c6891e0417"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/96baa902364319459742cd7bebad7367b73446e9",
-                "reference": "96baa902364319459742cd7bebad7367b73446e9",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/888f0ea2507fcc332a51fe9d2dcba7c6891e0417",
+                "reference": "888f0ea2507fcc332a51fe9d2dcba7c6891e0417",
                 "shasum": ""
             },
             "require": {
@@ -415,7 +327,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-17T12:51:32+00:00"
+            "time": "2024-09-25T14:21:43+00:00"
         }
     ],
     "packages-dev": [],
