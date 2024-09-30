@@ -17,8 +17,6 @@
         "symfony/yaml": "7.2.x-dev",
         "ext-apcu": "*"
     },
-    "require-dev": {
-    },
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
