@@ -13,6 +13,8 @@ class MiniLoader implements LoaderInterface
 {
     const string CLASSNAME = __CLASS__;
 
+    public static array $loadedClasses = [];
+    public static array $missingClasses = [];
     private static bool $registered = false;
     private static self $instance;
     protected MiniConfig $config;
@@ -49,6 +51,22 @@ class MiniLoader implements LoaderInterface
         $this->initialConfig['megaloader']['psr-4']['Hobosoft\\MegaLoader\\'] = dirname(__DIR__).'/src/';
 
         $this->register();
+        try {
+            Utils::includeArray([
+                'Contracts/*',
+                'Exceptions/*',
+                'Traits/*',
+                'Composer/*',
+                'Locators/*',
+                'Loaders/*',
+                'Decorators/*',
+                'Type.php',
+            ], __DIR__, Utils::ALLOW_GLOB);
+        } catch(\Exception $e) {
+            print $e->getMessage();
+        }
+        //class_exists(Type::class, true);
+
         //class_exists('Hobosoft\MegaLoader\MiniConfig');
         //class_exists('Hobosoft\MegaLoader\MiniLogger');
         $this->config = new MiniConfig($this->initialConfig);
@@ -126,12 +144,12 @@ class MiniLoader implements LoaderInterface
                 if(isset($this->logger)) {
                     $this->logger->info("   MiniLoader Computed filename '$filename' was good.");
                 }
-                $this->loadedClasses[$className] = $filename;
+                self::$loadedClasses[$className] = $filename;
                 require_once $filename;
                 return true;
             }
         }
-        $this->missingClasses[$className] = true;
+        self::$missingClasses[$className] = true;
         if(isset($this->logger)) {
             $this->logger->info("MiniLoader Failed to load class '$className'");
         }

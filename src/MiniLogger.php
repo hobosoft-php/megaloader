@@ -2,6 +2,7 @@
 
 namespace Hobosoft\MegaLoader;
 
+use Hobosoft\Logger\LogItem;
 use Psr\Log\LoggerInterface;
 
 define('LOGGER_DEBUG', 1);
@@ -33,10 +34,9 @@ class MiniLogger extends MiniDecorator
             self::$miniLoggers = [];
             if(LOGGER_DEBUG) {
                 register_shutdown_function(function () {
-
+                    $h = ob_list_handlers();
                     $this->info("shutting down:");
-                    //print_r(self::$miniLoggers);
-                    
+                    //'print_r(self::$miniLoggers);
                 });
             }
         }
@@ -61,11 +61,12 @@ class MiniLogger extends MiniDecorator
 
     public function log($level, \Stringable|string $message, array $context = []): void
     {
-        $this->items[] = [
+        /*$this->items[] = [
             'level' => $level,
             'message' => $message,
             'context' => $context + ['channel' => 'minilogger-'.$this->name],
-        ];
+        ];*/
+        print($level. ':  ' . $message . "\n");
     }
 
     public function setLogger(mixed $logger): void

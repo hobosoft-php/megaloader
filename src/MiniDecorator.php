@@ -14,8 +14,8 @@ abstract class MiniDecorator
     public function __call(string $name, array $arguments): mixed
     {
         if(is_null($this->decorated)) {
-            if(method_exists(static::CLASSNAME, $name)) {
-                return call_user_func_array([static::CLASSNAME, $name], $arguments);
+            if(method_exists(static::class, $name)) {
+                return call_user_func_array([static::class, $name], $arguments);
             }
         }
         else {

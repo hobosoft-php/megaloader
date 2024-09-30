@@ -16,6 +16,8 @@ class MegaLoader //implements LoaderInterface
 {
     const string CACHE_SECTION = 'megaloader-' . PHP_SAPI;
 
+    public static array $loadedClasses = [];
+    public static array $missingClasses = [];
     private static self                  $instance;
     public static array                  $pluginPsr4 = [];
     protected string                     $rootPath;
@@ -27,7 +29,7 @@ class MegaLoader //implements LoaderInterface
 
     public static function create(MiniLoader|string|null $arg = null): self
     {
-        //$configFile = ROOTPATH . '/config/megaloader.php';
+        $configFile = ROOTPATH . '/config/megaloader.php';
         if(isset(self::$instance)) {
             return self::$instance;
         }
@@ -61,22 +63,6 @@ class MegaLoader //implements LoaderInterface
     {
         $this->rootPath = $miniLoader->getRootPath();
 
-        try {
-            Utils::includeArray([
-                'Contracts/*',
-                'Exceptions/*',
-                'Traits/*',
-                'Composer/*',
-                'Locators/*',
-                'Loaders/*',
-                'Decorators/*',
-                'Type.php',
-            ], __DIR__, Utils::ALLOW_GLOB);
-        } catch(\Exception $e) {
-            print $e->getMessage();
-        }
-        //class_exists(Type::class, true);
-
         $this->logger = $miniLoader->getLogger();
         $this->config = $miniLoader->getConfig();
 
@@ -95,13 +81,14 @@ class MegaLoader //implements LoaderInterface
             use LoaderTraits, ResolverTraits;
         };
 
-        foreach(($this->config['locators'] ?? []) as $type => $locators) {
+        $section = $this->config['megaloader'];
+        foreach(($section['locators'] ?? []) as $type => $locators) {
             foreach($locators as $locator) {
                 $this->locatorResolver->add(Type::fromString($type), $locator);
             }
         }
 
-        foreach(($this->config['loaders'] ?? []) as $type => $loader) {
+        foreach(($section['loaders'] ?? []) as $type => $loader) {
             $this->loaderResolver->add(Type::fromString($type), $loader);
         }
 
@@ -117,7 +104,7 @@ class MegaLoader //implements LoaderInterface
             $this->loaderResolver->decorate(Type::T_CLASS, ClassLoader::class, CacheLocatorDecorator::class);
             $this->logger->info("Cache enabled for megaloader.");
         }*/
-        spl_autoload_register([$this, 'load'], true, $this->config['prepend'] ?? false);
+        spl_autoload_register([$this, 'load'], true, $this->config['megaloader.prepend'] ?? false);
 
         //make the miniloader destruct
         $miniLoader->unregister();
