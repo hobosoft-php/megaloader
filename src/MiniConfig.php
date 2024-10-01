@@ -83,7 +83,7 @@ class MiniConfig extends MiniDecorator implements \ArrayAccess
     public function set(mixed $name, mixed $data = null): void
     {
         if(is_null($data)) {
-            $this->config = $name;
+            $this->config = is_string($name) ? [$name] : $name->toArray();
             return;
         }
         $this->config[$name] = $data;

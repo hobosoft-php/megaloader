@@ -35,11 +35,15 @@ class Psr4Locator implements LocatorInterface
                 return $filename;
             }
         }
+
         $cfg = $this->config->get('megaloader');
         foreach ($cfg['psr-4'] as $k => $v) {
-            print("plugin psr4: '$k' = '$v'\n");
-            if (($filename = $this->makeFilename(ROOTPATH, $name, $k, $v)) !== false) {
-                return $filename;
+            print("check psr4:  k = $k, v = ".implode(', ', $v)."\n");
+            foreach($v as $curV) {
+                //print("plugin psr4: '$k' = '$curV'\n");
+                if (($filename = $this->makeFilename(ROOTPATH, $name, $k, $curV)) !== false) {
+                    return $filename;
+                }
             }
         }
         return false;
