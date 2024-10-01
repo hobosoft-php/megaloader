@@ -7,8 +7,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Hobosoft\\MegaLoader\\": "src/",
-            "Hobosoft\\MegaLoader\\Tests\\": "tests/"
+            "Hobosoft\\MegaLoader\\": "src/"
         }
     },
     "require": {
