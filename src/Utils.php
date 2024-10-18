@@ -2,13 +2,32 @@
 
 namespace Hobosoft\MegaLoader;
 
+use Hobosoft\Container\TinyLogger;
+use Hobosoft\Logger\Contracts\LoggerInterface;
+
 class Utils
 {
     protected static array $includedFiles = [];
     protected static array $includedErrors = [];
+    protected static array $includesSkipped = [];
 
     protected static mixed $config;
     protected static bool $registered = false;
+
+    protected static MiniLogger $logger;
+
+    public static function setLogger(LoggerInterface $logger)
+    {
+        self::$logger->setLogger($logger);
+    }
+
+    public static function getLogger(): MiniLogger
+    {
+        if(isset(self::$logger) === false) {
+            self::$logger = new MiniLogger('includeUtils');
+        }
+        return self::$logger;
+    }
 
     public static function joinPaths(string ...$paths): string
     {
@@ -57,19 +76,17 @@ class Utils
         }
         if (array_key_exists($fn, self::$includedFiles)) {
             self::$includedErrors[$fn] = ['error' => true, 'message' => "File is already included by MegaLoader.\n\n"];
-            throw new \Exception("File '$fn' is already included by MegaLoader.");
+            self::getLogger()->notice("File '$fn' is already included by MegaLoader.");
         } else if (in_array($fn, get_included_files())) {
             self::$includedErrors[$fn] = ['error' => true, 'message' => "File is already included by something else.\n\n"];
-            throw new \Exception("File '$fn' is already included by something else.");
+            self::getLogger()->notice("File '$fn' is already included by something else.");
         }
         else if (file_exists(($fn)) === false) {
-            self::$includedErrors[$fn] = ['error' => true, 'message' => "Include file '$fn' not found, please check autoloader configuration.\n"];
+            //self::$includedErrors[$fn] = ['error' => true, 'message' => "Include file '$fn' not found, please check autoloader configuration.\n"];
             throw new \Exception("Include file '$fn' not found, please check autoloader configuration.");
         }
         self::$includedFiles[$fn] = ['error' => false, 'message' => 'success'];
-        (function (string $fn): void {
-            require $fn;
-        })($fn);
+        (function (string $fn): void { require $fn; })($fn);
         return true;
     }
 
@@ -93,9 +110,15 @@ class Utils
         return $list;
     }
 
+    public static function included(string $fileName): bool
+    {
+        return in_array($fileName, get_included_files());
+    }
+
     public static function includeArray(array $fileList, string $basePath = null, int $flags = 0): bool
     {
         $errors = [];
+        $incs = [];
         while(!empty($fileList)) {
             $fileName = array_shift($fileList);
             if(is_array($fileName) === true) {
@@ -107,20 +130,29 @@ class Utils
             }
             if($flags & self::ALLOW_GLOB && self::str_contains_any($fileName, ['*', '?', '[', ']'])) {
                 $r = glob($fileName);
-                $fileList = array_merge($fileList, self::filesOnly($r));
+                $incs = array_merge($incs, self::filesOnly($r));
             }
             else {
+                $incs[] = $fileName;
+            }
+        }
+        if(!empty($incs)) {
+            foreach($incs as $fn) {
+                if(in_array($fn, get_included_files())) {
+                    self::$includesSkipped[$fn] = 'Already included';
+                    continue;
+                }
                 try {
-                    self::includeFile($fileName, $flags);
+                    self::includeFile($fn, $flags);
                 }
                 catch (\Exception $e) {
-                    print("Error including $fileName.\n");
+                    print("Error including $fn.\n");
                     $errors[] = $e->getMessage();
                 }
             }
         }
         if(count($errors) > 0) {
-            throw new \Exception("Error including files:  \n   ".implode("\n   ", $errors));
+            self::getLogger()->error("Error including files:  \n   ".implode("\n   ", $errors));
         }
         return true;
     }
