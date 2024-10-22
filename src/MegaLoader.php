@@ -26,6 +26,17 @@ class MegaLoader //implements LoaderInterface
     protected Composer                   $composer;
     protected ResolvingLoaderInterface   $loaderResolver;
     protected ResolvingLocatorInterface  $locatorResolver;
+    private static mixed                 $composerLoader = null;
+
+    public static function setComposerClassLoader(mixed $obj): void
+    {
+        self::$composerLoader = $obj;
+    }
+
+    public static function getComposerLoader(): mixed
+    {
+        return self::$composerLoader;
+    }
 
     public static function create(MiniLoader|string|null $arg = null): self
     {

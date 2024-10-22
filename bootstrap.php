@@ -11,7 +11,7 @@ if(!defined('ROOTPATH')) {
 
 require_once __DIR__ . '/src/MiniLoader.php';
 
-$loader = MiniLoader::create();
-$loader = MegaLoader::create($loader);
+$miniLoader = MiniLoader::create();
+$megaLoader = MegaLoader::create($miniLoader);
 
-return $loader;
+return $megaLoader;
